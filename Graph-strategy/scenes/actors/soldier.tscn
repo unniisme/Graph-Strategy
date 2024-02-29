@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cwliheqsmrtrx"]
+
+[ext_resource type="Script" path="res://scripts/objects/Soldier.cs" id="1_a0wh8"]
+[ext_resource type="Texture2D" uid="uid://c1frepr86ms80" path="res://icon.svg" id="2_d3uyd"]
+[ext_resource type="Script" path="res://scripts/grid/navigation/GodotGridNavigationAgent.cs" id="3_6vbln"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s2eye"]
+size = Vector2(16, 16)
+
+[node name="Soldier" type="Node2D"]
+script = ExtResource("1_a0wh8")
+setLayerZ = false
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_s2eye")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.125, 0.125)
+texture = ExtResource("2_d3uyd")
+
+[node name="GodotGridNavigationAgent" type="Node2D" parent="."]
+script = ExtResource("3_6vbln")
+Agent = "AStar"
+Depth = 30
