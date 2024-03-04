@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Godot;
 
 namespace Graphs
 {
     public class IslandBridgeAlgorithm<T>
     {
-        Graph<Islet<T>> overGraph;
+        public Graph<Islet<T>> overGraph;
         public SimpleGraph<Islet<T>> GetIslandBridgeGraph(Node<T> startNode)
         {
             overGraph = new();
@@ -25,7 +26,7 @@ namespace Graphs
             
             ExpandNode(currNode, currIslet);
 
-            // Code to Complete islet graphs here            
+            // Code to Complete islet graphs here   
 
             return PostProcess(overGraph);
         } 
@@ -50,18 +51,16 @@ namespace Graphs
         {
             if (currIslet.Nodes.Contains(currNode)) return;
 
+            GD.Print($"[IslandBridge] Expanding {currNode.Data}");
+
             // If node is already visited, it is in a different Island. Add an edge between these 2 islets
             // If the edge falls between 2 islands, they will be merged on postprocessing
             Islet<T> visitedIslet = VisitedIslet(currNode);
             if (visitedIslet != null)
             {
-                try
+                if (visitedIslet.IsIsland)
                 {
-                    overGraph.AddEdge(currIslet, visitedIslet, currIslet);
-                }
-                catch (GraphException<T>)
-                {
-                    // If edge already present, ignore
+                    TryAddEdge(currIslet, visitedIslet, currIslet);
                 }
                 return;
             }
@@ -72,14 +71,14 @@ namespace Graphs
             {
                 Islet<T> bridge = new(false);
                 overGraph.AddNode(bridge);
-                overGraph.AddEdge(bridge, currIslet, bridge);
+                TryAddEdge(bridge, currIslet, bridge);
                 currIslet = bridge;
             }
             else if (!currIslet.IsIsland && currNode.Degree > 2)
             {
                 Islet<T> island = new(true);
                 overGraph.AddNode(island);
-                overGraph.AddEdge(island, currIslet, currIslet);
+                TryAddEdge(currIslet, island, currIslet);
                 currIslet = island;
             }
 
@@ -90,22 +89,30 @@ namespace Graphs
             }
         }
 
+        private void TryAddEdge(Islet<T> from, Islet<T> to, Islet<T> data)
+        {
+            if (from == to) return;
+            if (overGraph.GetEdge(overGraph.DataNodeMap[from], overGraph.DataNodeMap[to]) == null)
+                overGraph.AddEdge(from, to, data);
+        }
+
         private static SimpleGraph<Islet<T>> PostProcess(Graph<Islet<T>> graph)
         {
             SimpleGraph<Islet<T>> finalGraph = new();
 
             Dictionary<Node<Islet<T>>, Node<Islet<T>>> nodeMap = new();
+
             HashSet<Edge<Islet<T>>> visitedEdges = new();
             
             foreach (Edge<Islet<T>> edge in graph.Edges)
             {
-                if (visitedEdges.Contains(edge)) 
-                    continue;
-                visitedEdges.Add(edge);
-
                 // If edge data is an island, it's an edge between 2 islands
                 if (edge.Data.IsIsland)
                 {
+                    if (visitedEdges.Contains(edge)) 
+                        continue;
+                    visitedEdges.Add(edge);
+
                     bool fromPresent = nodeMap.ContainsKey(edge.FromNode);
                     bool toPresent = nodeMap.ContainsKey(edge.ToNode);
 
@@ -144,10 +151,34 @@ namespace Graphs
                         nodeMap[edge.ToNode] = newNode;
                     }
                 }
+            }
 
+            // Bridges are handled after islands are
+            foreach (Edge<Islet<T>> edge in graph.Edges)
+            {
                 // If this edge is between an island and a bridge
-                else
+                if (!edge.Data.IsIsland)
                 {
+                    if (visitedEdges.Contains(edge)) 
+                        continue;
+                    visitedEdges.Add(edge);
+                    // // For now just add them in
+                    // if(!nodeMap.ContainsKey(edge.FromNode))
+                    // {
+                    //     Node<Islet<T>> bridge = finalGraph.AddNode(edge.FromNode.Data);
+                    //     nodeMap[edge.FromNode] = bridge;
+                    // }
+                    // if(!nodeMap.ContainsKey(edge.ToNode))
+                    // {
+                    //     Node<Islet<T>> island = finalGraph.AddNode(edge.ToNode.Data);
+                    //     nodeMap[edge.ToNode] = island;
+                    // }
+
+                    // if (finalGraph.GetEdge(nodeMap[edge.FromNode], nodeMap[edge.ToNode]) == null)
+                    // {
+                    //     finalGraph.AddEdge(nodeMap[edge.FromNode], nodeMap[edge.ToNode], edge.Data);
+                    // }
+
                     // Find the edge from the bridge to the other island
                     Edge<Islet<T>> otherEdge = edge;
                     foreach (Edge<Islet<T>> e in edge.FromNode.AdjList)
@@ -168,7 +199,16 @@ namespace Graphs
                                                     finalGraph.AddNode(otherEdge.ToNode.Data);
                     nodeMap[otherEdge.ToNode] = toNode;
 
-                    finalGraph.AddEdge(fromNode, toNode, edge.Data);
+                    // If it's connected to the same island, simple merge with the island
+                    if (fromNode == toNode)
+                    {
+                        edge.ToNode.Data.JoinNodes(edge.FromNode.Data);
+                    }
+                    else
+                    {
+                        if (finalGraph.GetEdge(fromNode, toNode) == null)
+                            finalGraph.AddEdge(fromNode, toNode, edge.Data);
+                    }
                 }
             }
 

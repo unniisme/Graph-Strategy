@@ -1,33 +1,42 @@
 using System.Collections.Generic;
+using Godot;
 namespace Graphs
 {
-    public class Node<T> : INode<T>
+    public class Node<T>
     {
-        public T Data { get; set; }
-        public virtual List<IEdge<T>> AdjList { get; } = new List<IEdge<T>>();
-        public int Degree => AdjList.Count;
-        public List<Node<T>> Neighbors => AdjList.ConvertAll((IEdge<T> edge) => edge.ToNode);
+        public virtual T Data { get; set; }
+        public virtual List<Edge<T>> AdjList { get; } = new List<Edge<T>>();
+        public virtual int Degree => AdjList.Count;
+        public virtual List<Node<T>> Neighbors => AdjList.ConvertAll((Edge<T> edge) => edge.ToNode);
     }
 
-    public class Edge<T> : IEdge<T>
+    public class Edge<T>
     {
         public Node<T> FromNode { get; set; }
         public Node<T> ToNode { get; set; }
         public T Data { get; set; }
     }
 
-    public class Graph<T> : IGraph<T>
+    public class Graph<T>
     {
         public List<Node<T>> Nodes { get; } = new List<Node<T>>();
         public List<Edge<T>> Edges { get; } = new List<Edge<T>>();
 
-        List<INode<T>> IGraph<T>.Nodes => throw new System.NotImplementedException();
-
-        List<IEdge<T>> IGraph<T>.Edges => throw new System.NotImplementedException();
-
         public Dictionary<Node<T>, Dictionary<Node<T>, Edge<T>>> AdjMat = new();
 
         public Dictionary<T, Node<T>> DataNodeMap = new();
+
+        public Edge<T> GetEdge(Node<T> from, Node<T> to)
+        {
+            if (AdjMat.ContainsKey(from))
+            {
+                if (AdjMat[from].ContainsKey(to))
+                {
+                    return AdjMat[from][to];
+                }
+            }
+            return null;
+        }
 
         public virtual Node<T> AddNode(T data)
         {
@@ -46,13 +55,14 @@ namespace Graphs
 
         public virtual void RemoveNode(Node<T> node)
         {
-            foreach (Edge<T> edge in node.AdjList)
+            List<Edge<T>> adjList = new (node.AdjList);
+            foreach (Edge<T> edge in adjList)
             {
                 RemoveEdge(edge);
             }
             foreach (Node<T> fromNode in AdjMat.Keys)
             {
-                if (AdjMat[fromNode][node] != null)
+                if (GetEdge(fromNode, node) != null)
                 {
                     RemoveEdge(AdjMat[fromNode][node]);
                 }
@@ -68,7 +78,7 @@ namespace Graphs
 
         public virtual void AddEdge(Node<T> fromNode, Node<T> toNode, T data)
         {
-            if (AdjMat[fromNode][toNode] != null)
+            if (GetEdge(fromNode, toNode) != null)
             {
                 throw new GraphException<T>("Edge already present", this);
             }
@@ -93,7 +103,7 @@ namespace Graphs
         {
             if (AdjMat[fromNode][toNode] == null)
             {
-                throw new GraphException<T>("Edge not present", this);
+                return;
             }
 
             Edge<T> edge = AdjMat[fromNode][toNode];
@@ -117,7 +127,7 @@ namespace Graphs
         public override void AddEdge(Node<T> fromNode, Node<T> toNode, T data)
         {
             base.AddEdge(fromNode, toNode, data);
-            base.AddEdge(fromNode, toNode, data);
+            base.AddEdge(toNode, fromNode, data);
         }
 
         public override void RemoveEdge(Node<T> fromNode, Node<T> toNode)

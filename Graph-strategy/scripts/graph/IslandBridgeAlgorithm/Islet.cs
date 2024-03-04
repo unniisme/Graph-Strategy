@@ -25,7 +25,8 @@ namespace Graphs
         public void AddNode(Node<T> newNode)
         {
             if (Nodes.Contains(newNode))
-                throw new GraphException<T>("Islet already has edge", this);
+                return;
+                // throw new GraphException<T>("Islet already has edge", this);
 
             Nodes.Add(newNode);
 

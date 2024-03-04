@@ -6,13 +6,13 @@ namespace Graphs
     {
         public T Data { get; set; }
         public int Degree {get;}
-        public List<Node<T>> Neighbors {get;}
+        public List<INode<T>> Neighbors {get;}
     }
 
     public interface IEdge<T>
     {
-        public Node<T> FromNode { get; set; }
-        public Node<T> ToNode { get; set; }
+        public INode<T> FromNode { get; set; }
+        public INode<T> ToNode { get; set; }
         public T Data { get; set; }
     }
 
