@@ -28,13 +28,12 @@ namespace Gamelogic.Managers
                     Vector2I pos = grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition());
 
                     gridGraph = new(grid, pos);
-                    islandGraph = new IslandBridgeAlgorithm<Vector2I>().GetIslandBridgeGraph(gridGraph.Nodes[0]); 
+                    islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.Nodes[0]); 
 
-                    if (debugWrite)
+                    if (debugWrite) 
                         GD.Print(ShowIslandGraph(islandGraph));
                     if (debugDraw)
                         QueueRedraw();
-
                 }
             }
         }
