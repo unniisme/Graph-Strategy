@@ -8,6 +8,7 @@ size = Vector2(16, 16)
 
 [node name="Soldier" type="Node2D"]
 script = ExtResource("1_a0wh8")
+moveTime = 0.8
 setLayerZ = false
 
 [node name="Area2D" type="Area2D" parent="."]
@@ -18,4 +19,4 @@ shape = SubResource("RectangleShape2D_s2eye")
 [node name="GodotGridNavigationAgent" type="Node2D" parent="."]
 script = ExtResource("3_6vbln")
 Agent = "AStar"
-Depth = 30
+Depth = 100

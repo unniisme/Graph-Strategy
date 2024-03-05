@@ -21,7 +21,7 @@ namespace Gamelogic.Objects
             set
             {
                 selectedSoldier = value;
-                // GameManager.GetLevel().selectedSoldier = value;
+                GameManager.GetLevel().selectedSoldier = value;
             }
         }
 
@@ -48,7 +48,7 @@ namespace Gamelogic.Objects
             }
 
             if (Input.IsMouseButtonPressed(MouseButton.Left)
-                && GameManager.GetLevel().PlayingTeam == teamName
+                && GameManager.GetLevel().CanAttack
                 && isSelected)
             {
                 Vector2I targetPos = grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition());
@@ -56,7 +56,6 @@ namespace Gamelogic.Objects
                 {
                     targetCell = targetPos;
                     GameManager.GetLevel().MadeMove();
-                    Deselect();
                 }
             }
         }
@@ -91,7 +90,7 @@ namespace Gamelogic.Objects
         {
             if (@event is InputEventMouseButton mouseEvent)
             {
-                if (mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.IsPressed())
+                if (mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.IsPressed() && GameManager.GetLevel().CanAttack)
                 {
                     ToggleSelect();
                 }

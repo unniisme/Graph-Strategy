@@ -1,9 +1,120 @@
-[gd_scene load_steps=2 format=3 uid="uid://7jltljgevcyv"]
+[gd_scene load_steps=18 format=3 uid="uid://7jltljgevcyv"]
 
 [ext_resource type="PackedScene" uid="uid://cwliheqsmrtrx" path="res://scenes/actors/soldier.tscn" id="1_s81wh"]
+[ext_resource type="Texture2D" uid="uid://368o0i01q1od" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Goblins/Troops/Torch/Red/Torch_Red.png" id="2_m2ofl"]
+[ext_resource type="Script" path="res://scripts/animation/animations/MovableGridObjectAnimation.cs" id="3_eguat"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eop18"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_64d8t"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ppqhx"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_buq0d"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h3w8d"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1yaq3"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dehee"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_veghb"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(0, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k5l15"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(192, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ttu1r"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(384, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l3cck"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(576, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f8kvh"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(768, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6fyja"]
+atlas = ExtResource("2_m2ofl")
+region = Rect2(960, 192, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jqqw0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eop18")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_64d8t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ppqhx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_buq0d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h3w8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1yaq3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dehee")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_veghb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k5l15")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ttu1r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l3cck")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f8kvh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6fyja")
+}],
+"loop": true,
+"name": &"moving",
+"speed": 10.0
+}]
 
 [node name="RedSoldier" instance=ExtResource("1_s81wh")]
 teamName = "red"
 
-[node name="Sprite2D" parent="." index="1"]
-modulate = Color(0.976471, 0, 0.392157, 1)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="2"]
+scale = Vector2(0.25, 0.25)
+sprite_frames = SubResource("SpriteFrames_jqqw0")
+animation = &"moving"
+autoplay = "idle"
+flip_h = true
+script = ExtResource("3_eguat")
