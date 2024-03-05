@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3 uid="uid://dofkserbyerwn"]
+
+[ext_resource type="Script" path="res://scripts/objects/Tower.cs" id="1_hoxeq"]
+[ext_resource type="Texture2D" uid="uid://csm2hcg3llxnd" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Goblins/Buildings/Wood_Tower/Wood_Tower_Red.png" id="2_cbbn0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6umrt"]
+atlas = ExtResource("2_cbbn0")
+region = Rect2(0, 0, 256, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mgl27"]
+atlas = ExtResource("2_cbbn0")
+region = Rect2(256, 0, 256, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sbwt7"]
+atlas = ExtResource("2_cbbn0")
+region = Rect2(512, 0, 256, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_op82e"]
+atlas = ExtResource("2_cbbn0")
+region = Rect2(768, 0, 256, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_osige"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6umrt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mgl27")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sbwt7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_op82e")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="RedTower" type="Node2D"]
+script = ExtResource("1_hoxeq")
+teamName = "red"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.205, 0.205)
+sprite_frames = SubResource("SpriteFrames_osige")
+autoplay = "default"
+offset = Vector2(0, -42.225)

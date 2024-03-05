@@ -22,8 +22,6 @@ namespace Gamelogic.Grid
 		{
 			grid ??= GameManager.GetLevel().grid;
 
-			TileSet.TileSize = (Vector2I)grid.Scale;
-
 			foreach (Vector2I pos in GetUsedCells(gridLayer))
 			{
 				grid.PlaceObject(new MovableGridObject(), pos);

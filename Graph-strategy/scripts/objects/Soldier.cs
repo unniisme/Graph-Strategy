@@ -21,7 +21,7 @@ namespace Gamelogic.Objects
             set
             {
                 selectedSoldier = value;
-                GameManager.GetLevel().selectedSoldier = value;
+                // GameManager.GetLevel().selectedSoldier = value;
             }
         }
 

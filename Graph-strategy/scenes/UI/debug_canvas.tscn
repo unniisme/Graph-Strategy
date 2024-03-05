@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bt0o5meh7nm8b"]
+
+[ext_resource type="Script" path="res://scripts/misc/coordinates.gd" id="1_kflsk"]
+
+[node name="DebugCanvas" type="CanvasLayer"]
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("1_kflsk")

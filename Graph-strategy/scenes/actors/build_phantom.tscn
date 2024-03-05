@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmc6td63j2cxh"]
+
+[ext_resource type="Script" path="res://scripts/gameLogic/BuildPhantom.cs" id="1_5qrnu"]
+
+[node name="BuildPhantom" type="Sprite2D"]
+script = ExtResource("1_5qrnu")

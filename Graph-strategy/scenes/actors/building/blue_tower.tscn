@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://ctpe1x2xp4cju"]
+
+[ext_resource type="Script" path="res://scripts/objects/Tower.cs" id="1_eo03r"]
+[ext_resource type="Texture2D" uid="uid://drrmyeihklvty" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Knights/Buildings/Tower/Tower_Blue.png" id="2_fe2fj"]
+
+[node name="BlueTower" type="Node2D"]
+script = ExtResource("1_eo03r")
+teamName = "blue"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_fe2fj")
+offset = Vector2(0, -73.685)

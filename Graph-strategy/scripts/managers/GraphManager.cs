@@ -18,24 +18,18 @@ namespace Gamelogic.Managers
         [Export]
         public bool debugDraw = false;
 
-        public override void _UnhandledInput(InputEvent @event)
+        public void CalculateIslands()
         {
-            if (@event is InputEventMouseButton mouseEvent)
-            {
-                if (mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
-                {
-                    grid ??= GameManager.GetLevel().grid;
-                    Vector2I pos = grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition());
+            grid ??= GameManager.GetLevel().grid;
+            Vector2I pos = grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition());
 
-                    gridGraph = new(grid, pos);
-                    islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.Nodes[0]); 
+            gridGraph = new(grid, pos);
+            islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.Nodes[0]); 
 
-                    if (debugWrite) 
-                        GD.Print(ShowIslandGraph(islandGraph));
-                    if (debugDraw)
-                        QueueRedraw();
-                }
-            }
+            if (debugWrite) 
+                GD.Print(ShowIslandGraph(islandGraph));
+            if (debugDraw)
+                QueueRedraw();
         }
 
         private void DrawIslands()
