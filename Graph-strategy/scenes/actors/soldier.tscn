@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cwliheqsmrtrx"]
+[gd_scene load_steps=5 format=3 uid="uid://cwliheqsmrtrx"]
 
 [ext_resource type="Script" path="res://scripts/objects/Soldier.cs" id="1_a0wh8"]
 [ext_resource type="Script" path="res://scripts/grid/navigation/GodotGridNavigationAgent.cs" id="3_6vbln"]
+[ext_resource type="Texture2D" uid="uid://t6eyyw03o46n" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/UI/Pointers/02.png" id="3_7dply"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s2eye"]
 size = Vector2(16, 16)
@@ -20,3 +21,8 @@ shape = SubResource("RectangleShape2D_s2eye")
 script = ExtResource("3_6vbln")
 Agent = "AStar"
 Depth = 100
+
+[node name="Selection" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(0.40625, 0.40625)
+texture = ExtResource("3_7dply")

@@ -15,7 +15,7 @@ namespace Gamelogic.Managers
 
         public string[] teams = {"blue", "red"};
 
-        private int currentTeam = 0;
+        private int currentTeam = 1;
         public string PlayingTeam => teams[currentTeam];
 
         public Soldier selectedSoldier = null;

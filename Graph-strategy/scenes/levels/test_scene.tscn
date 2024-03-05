@@ -24,7 +24,7 @@ script = ExtResource("1_b8eop")
 grid = NodePath("GodotGrid")
 buildGrid = NodePath("BuildingGrid")
 phantoms = [NodePath("Phantoms/BluePhantom"), NodePath("Phantoms/RedPhantom")]
-totalMoves = 3
+totalMoves = 4
 
 [node name="BuildingMask" type="TileMap" parent="." node_paths=PackedStringArray("grid")]
 tile_set = ExtResource("1_bu2tg")
@@ -125,6 +125,7 @@ offset = Vector2(0, -71.87)
 grid = NodePath("../../BuildingGrid")
 teamName = "blue"
 towerScenePath = "res://scenes/actors/building/blue_tower.tscn"
+distanceToOtherTowers = 3
 
 [node name="RedPhantom" parent="Phantoms" node_paths=PackedStringArray("grid") instance=ExtResource("9_y1g3g")]
 modulate = Color(1, 0.2, 0.0862745, 0.447059)
@@ -135,3 +136,4 @@ offset = Vector2(0, -42.225)
 grid = NodePath("../../BuildingGrid")
 teamName = "red"
 towerScenePath = "res://scenes/actors/building/red_tower.tscn"
+distanceToOtherTowers = 3

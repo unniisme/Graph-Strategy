@@ -25,7 +25,17 @@ namespace Gamelogic.Objects
             }
         }
 
+        public bool IsSelected
+        {
+            get => isSelected;
+            set
+            {
+                isSelected = value;
+                selectionSprite.Visible = value;
+            }
+        }
         private bool isSelected = false;
+        private Sprite2D selectionSprite = null;
 
         public override void _Ready()
         {
@@ -35,6 +45,8 @@ namespace Gamelogic.Objects
             agent = GetNode<GodotGridNavigationAgent>("GodotGridNavigationAgent");
             agent.SetGrid(GameManager.GetLevel().grid);
             GetNode<Area2D>("Area2D").InputEvent += OnInputEvent;
+
+            selectionSprite = (Sprite2D)FindChild("Selection");
         }
 
         public override void _Process(double delta)
@@ -62,27 +74,27 @@ namespace Gamelogic.Objects
 
         public void Select()
         {
-            if (!isSelected)
+            if (!IsSelected)
             {
                 selectedSoldier?.Deselect();
                 SelectedSoldier = this;
-                isSelected = true;
+                IsSelected = true;
                 GD.Print($"Selecting {Name}");
             }
         }
         public void Deselect()
         {
-            if (isSelected)
+            if (IsSelected)
             {
                 SelectedSoldier = null;
-                isSelected = false;
+                IsSelected = false;
                 GD.Print($"Deselecting {Name}");
             }
         }
 
         public void ToggleSelect()
         {
-            if (isSelected) Deselect();
+            if (IsSelected) Deselect();
             else Select();
         }
 

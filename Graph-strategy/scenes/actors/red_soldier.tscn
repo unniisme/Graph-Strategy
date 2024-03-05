@@ -114,7 +114,7 @@ teamName = "red"
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="2"]
 scale = Vector2(0.25, 0.25)
 sprite_frames = SubResource("SpriteFrames_jqqw0")
-animation = &"moving"
+animation = &"idle"
 autoplay = "idle"
 flip_h = true
 script = ExtResource("3_eguat")

@@ -1,10 +1,18 @@
 using System.Collections.Generic;
-using Godot;
 
 namespace Graphs
 {
     public class IslandBridgeAlgorithm<T>
     {
+        /// <summary>
+        /// Algorithm separates the graph into Bridges which are connected
+        /// subgraphs having degree 2 or less, and Islands, which are 
+        /// connected subgraphs (mostly) consistent nodes with degree 3 or more.
+        /// see <see cref="Islet{T}"/>.
+        /// Each island is connected to other islands by bridges
+        /// </summary>
+        /// <param name="startNode"></param>
+        /// <returns></returns>
         public static SimpleGraph<Islet<T>> GetIslandBridgeGraph(Node<T> startNode)
         {
             return PostProcess(ConstructOverGraph(startNode));
