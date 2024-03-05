@@ -8,6 +8,6 @@ script = ExtResource("1_eo03r")
 teamName = "blue"
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.25, 0.25)
+scale = Vector2(0.2, 0.2)
 texture = ExtResource("2_fe2fj")
 offset = Vector2(0, -73.685)

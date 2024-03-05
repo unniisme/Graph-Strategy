@@ -13,15 +13,31 @@ namespace Gamelogic.Managers
         private IGrid grid = null;
         private SimpleGraph<Islet<Vector2I>> islandGraph = null;
 
+        bool draw = false;
+
         [Export]
         public bool debugWrite = false;
         [Export]
         public bool debugDraw = false;
 
+        [Export]
+        public Node2D gridSeachStartTarget;
+
+        public void Debug()
+        {
+            if (grid == null)
+            {
+                CalculateIslands();
+            }
+
+            draw = !draw;
+            QueueRedraw();
+        }
+
         public void CalculateIslands()
         {
             grid ??= GameManager.GetLevel().grid;
-            Vector2I pos = grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition());
+            Vector2I pos = grid.GameCoordinateToGridCoordinate(gridSeachStartTarget.Position);
 
             gridGraph = new(grid, pos);
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.Nodes[0]); 
@@ -65,6 +81,7 @@ namespace Gamelogic.Managers
             if (gridGraph == null) return;
 
             // DrawGraph(gridGraph, 4, Colors.Blue);
+            if (draw)
             DrawIslands();
         }
 

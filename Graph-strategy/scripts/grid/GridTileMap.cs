@@ -1,4 +1,5 @@
 using Gamelogic.Managers;
+using Gamelogic.Objects;
 using Godot;
 
 namespace Gamelogic.Grid
@@ -9,7 +10,8 @@ namespace Gamelogic.Grid
 	[GlobalClass]
 	public partial class GridTileMap : TileMap
 	{
-		public IGrid grid = null;
+		[Export]
+		public GodotGrid grid = null;
 
 		/// <summary>
 		/// Index of layer to register to grid
@@ -24,7 +26,11 @@ namespace Gamelogic.Grid
 
 			foreach (Vector2I pos in GetUsedCells(gridLayer))
 			{
-				grid.PlaceObject(new MovableGridObject(), pos);
+                StaticGridObject obj = new()
+                {
+                    grid = grid
+                };
+                grid.PlaceObject(obj, pos);
 			} 
 		}
 	}

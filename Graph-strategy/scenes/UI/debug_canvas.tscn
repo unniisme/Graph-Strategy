@@ -1,10 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://bt0o5meh7nm8b"]
+[gd_scene load_steps=3 format=3 uid="uid://bt0o5meh7nm8b"]
 
 [ext_resource type="Script" path="res://scripts/misc/coordinates.gd" id="1_kflsk"]
+[ext_resource type="Script" path="res://scenes/UI/debug_canvas.gd" id="1_w2k65"]
 
 [node name="DebugCanvas" type="CanvasLayer"]
+script = ExtResource("1_w2k65")
 
 [node name="Label" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 23.0
 script = ExtResource("1_kflsk")
+
+[node name="ShowGraphButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -8.0
+offset_bottom = 8.0
+grow_horizontal = 0
+text = "Show Island Graph"

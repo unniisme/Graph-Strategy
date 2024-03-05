@@ -10,7 +10,7 @@ namespace Gamelogic.Objects
         private Vector2I targetCell;
         private GodotGridNavigationAgent agent;
 
-        [Export]
+        [Export(PropertyHint.Enum, GameResources.TeamTypeHint)]
         public string teamName = "";
         public override string Tag => teamName;
         

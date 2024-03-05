@@ -12,7 +12,7 @@ namespace Gamelogic
         [Export]
         public GodotGrid grid;
 
-        [Export]
+        [Export(PropertyHint.Enum, GameResources.TeamTypeHint)]
         public string teamName = "";
         public string Tag => teamName;
 
@@ -26,9 +26,12 @@ namespace Gamelogic
 
         public Vector2I GridPosition => grid.GameCoordinateToGridCoordinate(Position);
 
+        private float alpha = 0.5f;
+
         public override void _Ready()
         {
             Off();
+            alpha = Modulate.A;
         }
 
         public override void _Process(double delta)
@@ -38,9 +41,22 @@ namespace Gamelogic
                 Position = grid.GridCoordinateToGameCoordinate(
                     grid.GameCoordinateToGridCoordinate(GetGlobalMousePosition())
                 );
+                if (CanPlace())
+                {
+                    Color mod = Modulate;
+                    mod.A = alpha;
+                    Modulate = mod;
+                }
+                else
+                {
+                    Color mod = Modulate;
+                    mod.A = alpha/4;
+                    Modulate = mod;
+                }
+
                 if (Input.IsActionJustReleased("Click"))
                 {   
-                    if (CanPlace())
+                    if (CanPlace(true))
                     {
                         PackedScene towerScene = ResourceLoader.Load<PackedScene>(towerScenePath);
                         Tower towerNode = towerScene.Instantiate<Tower>();
@@ -54,7 +70,7 @@ namespace Gamelogic
 
         }
 
-        private bool CanPlace()
+        private bool CanPlace(bool debug = false)
         {
             foreach (IGridObject obj in grid.PlacedObjects)
             {
@@ -64,10 +80,9 @@ namespace Gamelogic
                     return false;
                 }
 
-                Vector2I diff = obj.GridPosition - gridPosition;
-                if (MathF.Abs(diff.X + diff.Y) <= distanceToOtherTowers && obj.Tag != Tag)
+                Vector2I diff = (obj.GridPosition - gridPosition).Abs();
+                if ((diff.X + diff.Y) <= distanceToOtherTowers && obj.Tag == GameResources.OtherTeam(Tag))
                 {
-                    GD.Print($"Too close to {obj.Name} at {obj.GridPosition}");
                     return false;
                 }
             }
