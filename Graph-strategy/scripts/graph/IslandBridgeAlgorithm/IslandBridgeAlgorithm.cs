@@ -13,12 +13,12 @@ namespace Graphs
         /// </summary>
         /// <param name="startNode"></param>
         /// <returns></returns>
-        public static SimpleGraph<Islet<T>> GetIslandBridgeGraph(Node<T> startNode)
+        public static Graph<Islet<T>> GetIslandBridgeGraph(Node<T> startNode)
         {
             return PostProcess(ConstructOverGraph(startNode));
         } 
 
-        private static Graph<Islet<T>> ConstructOverGraph(Node<T> startNode)
+        public static Graph<Islet<T>> ConstructOverGraph(Node<T> startNode)
         {
             Graph<Islet<T>> overGraph = new();
 
@@ -100,13 +100,19 @@ namespace Graphs
         private static void TryAddEdge(Graph<Islet<T>> graph, Islet<T> from, Islet<T> to, Islet<T> data)
         {
             if (from == to) return;
-            if (graph.GetEdge(graph.DataNodeMap[from], graph.DataNodeMap[to]) == null)
-                graph.AddEdge(from, to, data);
+            foreach (Edge<Islet<T>> edge in graph.DataNodeMap[from].AdjList)
+            {
+                if (edge.Data == data && edge.ToNode.Data == to)
+                {
+                    return;
+                }
+            }
+            graph.AddEdge(from, to, data);
         }
 
-        private static SimpleGraph<Islet<T>> PostProcess(Graph<Islet<T>> graph)
+        public static Graph<Islet<T>> PostProcess(Graph<Islet<T>> graph)
         {
-            SimpleGraph<Islet<T>> finalGraph = new();
+            Graph<Islet<T>> finalGraph = new();
 
             Dictionary<Node<Islet<T>>, Node<Islet<T>>> nodeMap = new();
 
@@ -199,6 +205,7 @@ namespace Graphs
                     else
                     {
                         finalGraph.AddEdge(fromNode, toNode, edge.Data);
+                        finalGraph.AddEdge(toNode, fromNode, edge.Data);
                         visitedEdges.Add(otherEdge);
                     }
                 }

@@ -111,6 +111,9 @@ animations = [{
 [node name="RedSoldier" instance=ExtResource("1_s81wh")]
 teamName = "red"
 
+[node name="GodotGridNavigationAgent" parent="." index="1"]
+mask = PackedStringArray("red")
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="2"]
 scale = Vector2(0.25, 0.25)
 sprite_frames = SubResource("SpriteFrames_jqqw0")

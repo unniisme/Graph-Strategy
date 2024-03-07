@@ -29,12 +29,6 @@ namespace Graphs
                 // throw new GraphException<T>("Islet already has edge", this);
 
             Nodes.Add(newNode);
-
-            AdjMat[newNode] = new() {};
-            foreach (Node<T> node in Nodes)
-            {
-                AdjMat[newNode][node] = null;
-            }
         }
 
         public void JoinNodes(Islet<T> other)

@@ -11,7 +11,7 @@ namespace Gamelogic.Managers
     {
         private NavigationGridGraph gridGraph = null;
         private IGrid grid = null;
-        private SimpleGraph<Islet<Vector2I>> islandGraph = null;
+        private Graph<Islet<Vector2I>> islandGraph = null;
 
         bool draw = false;
 

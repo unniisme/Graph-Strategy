@@ -32,7 +32,7 @@ namespace Gamelogic.Grid
                 if (grid.GetObject(newPos) != null) continue;
                 if (DataNodeMap.ContainsKey(newPos))
                 {
-                    if (GetEdge(fromNode, DataNodeMap[newPos]) == null)
+                    if (!fromNode.Neighbors.Contains(DataNodeMap[newPos]))
                         AddEdge(fromNode, DataNodeMap[newPos], pos+newPos);
                     continue;
                 }
