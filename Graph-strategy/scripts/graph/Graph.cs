@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Godot;
 namespace Graphs
 {
     public class Node<T>
@@ -23,8 +22,8 @@ namespace Graphs
     /// <typeparam name="T"></typeparam>
     public class Graph<T>
     {
-        public List<Node<T>> Nodes { get; } = new List<Node<T>>();
-        public List<Edge<T>> Edges { get; } = new List<Edge<T>>();
+        public HashSet<Node<T>> Nodes { get; } = new HashSet<Node<T>>();
+        public HashSet<Edge<T>> Edges { get; } = new HashSet<Edge<T>>();
 
         public Dictionary<T, Node<T>> DataNodeMap = new();
 

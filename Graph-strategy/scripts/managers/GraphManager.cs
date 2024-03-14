@@ -40,7 +40,7 @@ namespace Gamelogic.Managers
             Vector2I pos = grid.GameCoordinateToGridCoordinate(gridSeachStartTarget.Position);
 
             gridGraph = new(grid, pos);
-            islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.Nodes[0]); 
+            islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]); 
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
