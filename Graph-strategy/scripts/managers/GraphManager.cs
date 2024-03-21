@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Gamelogic.Grid;
 using Godot;
 using Graphs;
+using Graphs.Shannon;
 
 namespace Gamelogic.Managers
 {
@@ -12,6 +13,7 @@ namespace Gamelogic.Managers
         private NavigationGridGraph gridGraph = null;
         private IGrid grid = null;
         private Graph<Islet<Vector2I>> islandGraph = null;
+        private Tuple<List<Edge<Islet<Vector2I>>>, List<Edge<Islet<Vector2I>>>> spanningTrees = null;
 
         bool draw = false;
 
@@ -19,6 +21,8 @@ namespace Gamelogic.Managers
         public bool debugWrite = false;
         [Export]
         public bool debugDraw = false;
+        [Export]
+        public bool debugDrawSpanningTrees = true;
 
         [Export]
         public Node2D gridSeachStartTarget;
@@ -42,6 +46,9 @@ namespace Gamelogic.Managers
             gridGraph = new(grid, pos);
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]); 
 
+            ShannonStrategy<Islet<Vector2I>> agent = new(islandGraph);
+            spanningTrees = agent.GetMove();
+
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
             if (debugDraw)
@@ -57,6 +64,14 @@ namespace Gamelogic.Managers
             foreach (Edge<Islet<Vector2I>> edge in islandGraph.Edges)
             {
                 DrawGraph(edge.Data, 3, Colors.Red);
+            }
+        }
+
+        private void DrawEdges(List<Edge<Islet<Vector2I>>> edges, Color color)
+        {
+            foreach (Edge<Islet<Vector2I>> edge in edges)
+            {
+                DrawGraph(edge.Data, 3, color);
             }
         }
 
@@ -81,8 +96,14 @@ namespace Gamelogic.Managers
             if (gridGraph == null) return;
 
             // DrawGraph(gridGraph, 4, Colors.Blue);
-            if (draw)
-            DrawIslands();
+            // if (draw)
+            // DrawIslands();
+
+            if (debugDrawSpanningTrees)
+            {
+                DrawEdges(spanningTrees.Item1, Colors.IndianRed);
+                DrawEdges(spanningTrees.Item2, Colors.AliceBlue);
+            }
         }
 
         private string ShowIslandGraph(Graph<Islet<Vector2I>> graph)

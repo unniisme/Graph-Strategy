@@ -69,5 +69,18 @@ namespace Graphs
             edge.FromNode.AdjList.Remove(edge);
             Edges.Remove(edge);
         }
+
+        public Edge<T> GetEdge(Node<T> from, Node<T> to)
+        {
+            // Possibly replace with an adjmat
+            foreach (Edge<T> edge in from.AdjList)
+            {
+                if (edge.ToNode == to)
+                {
+                    return edge;
+                }
+            }
+            return null;
+        }
     }
 }
