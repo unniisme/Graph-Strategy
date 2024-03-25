@@ -1,0 +1,71 @@
+[gd_scene load_steps=7 format=3 uid="uid://b4m0gabx66nh4"]
+
+[ext_resource type="Script" path="res://scripts/managers/LevelManager.cs" id="1_5nxgy"]
+[ext_resource type="TileSet" uid="uid://cuf6vqpwk66qv" path="res://resources/tilesets/TinySwords.tres" id="1_5wob6"]
+[ext_resource type="Script" path="res://scripts/grid/GridTileMap.cs" id="3_akyan"]
+[ext_resource type="Script" path="res://scripts/grid/GodotGrid.cs" id="4_vnumf"]
+[ext_resource type="Script" path="res://scripts/managers/GraphManager.cs" id="5_ljex1"]
+[ext_resource type="PackedScene" uid="uid://bmc6td63j2cxh" path="res://scenes/actors/build_phantom.tscn" id="7_jpb0g"]
+
+[node name="Template Level" type="Node2D" node_paths=PackedStringArray("grid", "buildGrid", "phantoms")]
+script = ExtResource("1_5nxgy")
+grid = NodePath("GodotGrid")
+buildGrid = NodePath("BuildGrid")
+phantoms = [NodePath("Phantoms/BluePhantom"), NodePath("Phantoms/RedPhantom")]
+
+[node name="GridMap" type="TileMap" parent="." node_paths=PackedStringArray("grid")]
+tile_set = ExtResource("1_5wob6")
+format = 2
+script = ExtResource("3_akyan")
+grid = NodePath("../GodotGrid")
+
+[node name="BuildMap" type="TileMap" parent="." node_paths=PackedStringArray("grid")]
+tile_set = ExtResource("1_5wob6")
+format = 2
+script = ExtResource("3_akyan")
+grid = NodePath("../BuildGrid")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = ExtResource("1_5wob6")
+format = 2
+layer_0/name = "Ground"
+layer_1/tile_data = PackedInt32Array()
+layer_2/tile_data = PackedInt32Array()
+layer_3/name = "Shadow"
+layer_3/tile_data = PackedInt32Array()
+layer_4/name = "Decor"
+layer_4/tile_data = PackedInt32Array()
+
+[node name="Decor" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.5, 0.5)
+
+[node name="GodotGrid" type="Node2D" parent="."]
+scale = Vector2(64, 64)
+script = ExtResource("4_vnumf")
+Offset = Vector2(32, 32)
+
+[node name="BuildGrid" type="Node2D" parent="."]
+scale = Vector2(64, 64)
+script = ExtResource("4_vnumf")
+Offset = Vector2(32, 32)
+
+[node name="Goblins" type="Node2D" parent="."]
+
+[node name="GraphManager" type="Node2D" parent="."]
+script = ExtResource("5_ljex1")
+
+[node name="ExpandTarget" type="Node2D" parent="GraphManager"]
+
+[node name="Phantoms" type="Node2D" parent="."]
+
+[node name="BluePhantom" parent="Phantoms" node_paths=PackedStringArray("grid") instance=ExtResource("7_jpb0g")]
+grid = NodePath("../../BuildGrid")
+teamName = "blue"
+towerScenePath = "res://scenes/actors/building/blue_tower.tscn"
+
+[node name="RedPhantom" parent="Phantoms" node_paths=PackedStringArray("grid") instance=ExtResource("7_jpb0g")]
+grid = NodePath("../../BuildGrid")
+teamName = "red"
+towerScenePath = "res://scenes/actors/building/red_tower.tscn"

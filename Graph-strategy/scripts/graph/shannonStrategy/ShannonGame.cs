@@ -40,7 +40,7 @@ namespace Graphs.Shannon
         }
 
 
-        public Tuple<List<Edge<T>>, List<Edge<T>>> GetMove()
+        public Tuple<List<Edge<T>>, List<Edge<T>>> GetSpanningTrees()
         {
             DSU<Node<T>> clumps = new();
             DSU<Node<T>> forest0 = new();

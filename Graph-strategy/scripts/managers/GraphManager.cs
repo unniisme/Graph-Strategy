@@ -47,7 +47,7 @@ namespace Gamelogic.Managers
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]); 
 
             ShannonStrategy<Islet<Vector2I>> agent = new(islandGraph);
-            spanningTrees = agent.GetMove();
+            spanningTrees = agent.GetSpanningTrees();
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));

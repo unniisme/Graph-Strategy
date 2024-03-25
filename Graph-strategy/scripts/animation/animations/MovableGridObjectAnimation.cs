@@ -40,7 +40,7 @@ namespace AnimationHandling
 
             try
             {
-                HorizontalFlip = (node.Position - gridObject.grid.GetObjectPositionInGameCoordinates((IGridObject)node)).X > 0;
+                HorizontalFlip = (node.Position - gridObject.grid.GetObjectPositionInGameCoordinates((IGridObject)node)).X >= 0;
             }
             catch (GridException)
             {
