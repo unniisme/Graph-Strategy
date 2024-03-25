@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dyx2btyjnkcei"]
+
+[ext_resource type="Texture2D" uid="uid://csm2hcg3llxnd" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Goblins/Buildings/Wood_Tower/Wood_Tower_Red.png" id="1_wlebf"]
+
+[resource]
+atlas = ExtResource("1_wlebf")
+region = Rect2(289, 0, 186, 192)

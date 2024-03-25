@@ -51,8 +51,6 @@ namespace Gamelogic.Managers
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
-            if (debugDraw)
-                QueueRedraw();
         }
 
         private void DrawIslands()
@@ -95,15 +93,21 @@ namespace Gamelogic.Managers
         {
             if (gridGraph == null) return;
 
-            // DrawGraph(gridGraph, 4, Colors.Blue);
-            // if (draw)
-            // DrawIslands();
-
-            if (debugDrawSpanningTrees)
+            if (draw)
             {
-                DrawEdges(spanningTrees.Item1, Colors.IndianRed);
-                DrawEdges(spanningTrees.Item2, Colors.AliceBlue);
+                if (debugDraw)
+                {
+                    DrawGraph(gridGraph, 4, Colors.Blue);
+                    DrawIslands();
+                }
+
+                if (debugDrawSpanningTrees)
+                {
+                    DrawEdges(spanningTrees.Item1, Colors.GreenYellow);
+                    DrawEdges(spanningTrees.Item2, Colors.AliceBlue);
+                }
             }
+
         }
 
         private string ShowIslandGraph(Graph<Islet<Vector2I>> graph)

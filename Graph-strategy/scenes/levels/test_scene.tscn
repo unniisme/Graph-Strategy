@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://c16v0cr4274nm"]
+[gd_scene load_steps=21 format=3 uid="uid://c16v0cr4274nm"]
 
 [ext_resource type="Script" path="res://scripts/managers/LevelManager.cs" id="1_b8eop"]
 [ext_resource type="TileSet" uid="uid://ccxgogmpaxoy0" path="res://resources/tilesets/grassy.tres" id="1_bu2tg"]
@@ -17,13 +17,9 @@
 [ext_resource type="Texture2D" uid="uid://bnid2y8hxc6vx" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Deco/03.png" id="10_s5u3a"]
 [ext_resource type="Texture2D" uid="uid://drrmyeihklvty" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Knights/Buildings/Tower/Tower_Blue.png" id="10_xi2mm"]
 [ext_resource type="Texture2D" uid="uid://hqrgxeioqldx" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Deco/15.png" id="11_7klf6"]
-[ext_resource type="Texture2D" uid="uid://csm2hcg3llxnd" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Factions/Goblins/Buildings/Wood_Tower/Wood_Tower_Red.png" id="11_dlv67"]
 [ext_resource type="Texture2D" uid="uid://c8u1sqjorxjc2" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Deco/14.png" id="12_jcoe1"]
 [ext_resource type="Texture2D" uid="uid://d3tbaghrwy2xo" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Deco/16.png" id="13_i8naq"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_uj5hb"]
-atlas = ExtResource("11_dlv67")
-region = Rect2(289, 0, 186, 192)
+[ext_resource type="Texture2D" uid="uid://dyx2btyjnkcei" path="res://resources/sprites/Red_tower.tres" id="20_5eo27"]
 
 [node name="TestScene" type="Node2D" node_paths=PackedStringArray("grid", "buildGrid", "phantoms")]
 texture_filter = 1
@@ -206,7 +202,7 @@ distanceToOtherTowers = 3
 modulate = Color(1, 0.2, 0.0862745, 0.447059)
 position = Vector2(64, -56)
 scale = Vector2(0.18, 0.18)
-texture = SubResource("AtlasTexture_uj5hb")
+texture = ExtResource("20_5eo27")
 offset = Vector2(0, -42.225)
 grid = NodePath("../../BuildingGrid")
 teamName = "red"

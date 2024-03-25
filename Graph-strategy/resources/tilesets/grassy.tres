@@ -2422,6 +2422,7 @@ texture = ExtResource("7_qj6dv")
 8:4/0/physics_layer_0/angular_velocity = 0.0
 
 [resource]
+tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Base terrain"
