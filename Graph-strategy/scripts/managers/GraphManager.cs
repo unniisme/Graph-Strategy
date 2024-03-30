@@ -46,7 +46,7 @@ namespace Gamelogic.Managers
             gridGraph = new(grid, pos);
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]); 
 
-            ShannonStrategy<Islet<Vector2I>> agent = new(islandGraph);
+            TwoPlayerShannonStrategy<Islet<Vector2I>> agent = new(islandGraph);
             spanningTrees = agent.GetSpanningTrees();
 
             if (debugWrite) 
@@ -65,11 +65,11 @@ namespace Gamelogic.Managers
             }
         }
 
-        private void DrawEdges(List<Edge<Islet<Vector2I>>> edges, Color color)
+        private void DrawEdges(List<Edge<Islet<Vector2I>>> edges, float radius, Color color)
         {
             foreach (Edge<Islet<Vector2I>> edge in edges)
             {
-                DrawGraph(edge.Data, 3, color);
+                DrawGraph(edge.Data, radius, color);
             }
         }
 
@@ -103,8 +103,8 @@ namespace Gamelogic.Managers
 
                 if (debugDrawSpanningTrees)
                 {
-                    DrawEdges(spanningTrees.Item1, Colors.GreenYellow);
-                    DrawEdges(spanningTrees.Item2, Colors.AliceBlue);
+                    DrawEdges(spanningTrees.Item1, 10,  Colors.GreenYellow);
+                    DrawEdges(spanningTrees.Item2, 10,  Colors.BlanchedAlmond);
                 }
             }
 

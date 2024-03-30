@@ -4,7 +4,7 @@ using Graphs.Utils;
 
 namespace Graphs.Shannon
 {
-    public class ShannonStrategy<T>
+    public class ShannonStrategy<T> : IShannonStrategy<T>
     {
         private readonly Graph<T> graph;
 

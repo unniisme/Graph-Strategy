@@ -110,14 +110,18 @@ animations = [{
 
 [node name="RedSoldier" instance=ExtResource("1_s81wh")]
 teamName = "red"
+moveTime = 0.1
 
 [node name="GodotGridNavigationAgent" parent="." index="1"]
 mask = PackedStringArray("red")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="2"]
-scale = Vector2(0.25, 0.25)
 sprite_frames = SubResource("SpriteFrames_jqqw0")
 animation = &"idle"
 autoplay = "idle"
 flip_h = true
 script = ExtResource("3_eguat")
+
+[node name="Selection" parent="." index="3"]
+modulate = Color(1, 1, 1, 0.435294)
+scale = Vector2(1.546, 1.546)

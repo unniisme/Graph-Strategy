@@ -33,7 +33,8 @@ grid = NodePath("../BuildGrid")
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource("1_5wob6")
 format = 2
-layer_0/name = "Ground"
+layer_0/name = "Base"
+layer_1/name = "Ground"
 layer_1/tile_data = PackedInt32Array()
 layer_2/tile_data = PackedInt32Array()
 layer_3/name = "Shadow"

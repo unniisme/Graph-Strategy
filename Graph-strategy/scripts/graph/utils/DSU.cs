@@ -5,13 +5,18 @@ namespace Graphs.Utils
 {
     public class DSU<T>
     {
-        private readonly Dictionary<T, T> parent;
-        private readonly Dictionary<T, int> rank;
+        internal readonly Dictionary<T, T> parent;
+        internal readonly Dictionary<T, int> rank;
 
         public DSU()
         {
             parent = new Dictionary<T, T>();
             rank = new Dictionary<T, int>();
+        }
+
+        public bool ContainsElement(T element)
+        {
+            return parent.ContainsKey(element);
         }
 
         public void MakeSet(T element)

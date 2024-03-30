@@ -27,10 +27,19 @@ namespace Graphs
 
         public Dictionary<T, Node<T>> DataNodeMap = new();
 
+        /// <summary>
+        /// Data to edge map
+        /// Consistency has to be maintained externally
+        /// </summary>
+        public Dictionary<T, Edge<T>> DataEdgeMap = new();
+
         public virtual Node<T> AddNode(T data)
         {
             Node<T> newNode = new() { Data = data };
             Nodes.Add(newNode);
+
+            if (DataNodeMap.ContainsKey(data))
+                throw new GraphException<T>("Graph nodes cannot contain duplicate keys", this);
 
             DataNodeMap[data] = newNode;
             return newNode;
@@ -55,6 +64,13 @@ namespace Graphs
                 ToNode = toNode,
                 Data = data
             };
+
+            // Maintain edge map consistency outside instead
+            // if (DataEdgeMap.ContainsKey(data))
+            //     throw new GraphException<T>("Graph edges cannot contain duplicate keys", this);
+
+            DataEdgeMap[data] = newEdge;
+
             fromNode.AdjList.Add(newEdge);
             Edges.Add(newEdge);
         }
@@ -68,6 +84,7 @@ namespace Graphs
         {
             edge.FromNode.AdjList.Remove(edge);
             Edges.Remove(edge);
+            DataEdgeMap.Remove(edge.Data);
         }
 
         public Edge<T> GetEdge(Node<T> from, Node<T> to)

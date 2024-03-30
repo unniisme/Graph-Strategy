@@ -33,13 +33,15 @@ namespace Gamelogic.Grid
                 if (DataNodeMap.ContainsKey(newPos))
                 {
                     if (!fromNode.Neighbors.Contains(DataNodeMap[newPos]))
-                        AddEdge(fromNode, DataNodeMap[newPos], pos+newPos);
+                        AddEdge(fromNode, DataNodeMap[newPos], pos+newPos + 100003 * (newPos - pos));
                     continue;
                 }
 
                 Node<Vector2I> toNode = MakeNode(newPos);
 
-                AddEdge(fromNode, toNode, pos+newPos);
+                // The weird data equation is to preserve uniqueness of edges
+                // Each edge is a pseudo independant pair of vectors 
+                AddEdge(fromNode, toNode, pos+newPos + 100003 * (newPos - pos));
             }
 
             return fromNode;

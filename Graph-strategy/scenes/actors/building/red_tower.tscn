@@ -44,7 +44,6 @@ script = ExtResource("1_hoxeq")
 teamName = "red"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-scale = Vector2(0.18, 0.18)
 sprite_frames = SubResource("SpriteFrames_osige")
 autoplay = "default"
 offset = Vector2(0, -42.225)
