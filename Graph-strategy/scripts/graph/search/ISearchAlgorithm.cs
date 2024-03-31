@@ -48,7 +48,5 @@ namespace Graphs.Search
         /// </summary>
         /// <returns></returns>
         public List<Node<T>> GetPathNodes();
-
-        public Func<T, IEnumerable<Edge<T>>> GetAdjList {get;set;}
     }
 }

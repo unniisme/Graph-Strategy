@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Gamelogic.Grid;
 using Godot;
 using Graphs;
@@ -38,15 +39,29 @@ namespace Gamelogic.Managers
             QueueRedraw();
         }
 
+        public static string IsletToString(Islet<Vector2I> graph)
+        {
+            string isIsland = graph.IsIsland?"Island":"Bridge";
+            List<Vector2I> nodes = new();
+            foreach (Node<Vector2I> node in graph.Nodes)
+            {
+                nodes.Add(node.Data);
+            }
+            return $"[{graph.UID}] {isIsland} {{ {string.Join(",", nodes)} }}";
+        }
+
         public void CalculateIslands()
         {
             grid ??= GameManager.GetLevel().grid;
             Vector2I pos = grid.GameCoordinateToGridCoordinate(gridSeachStartTarget.Position);
 
             gridGraph = new(grid, pos);
-            islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]); 
+            islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]);
 
-            TwoPlayerShannonStrategy<Islet<Vector2I>> agent = new(islandGraph);
+            TwoPlayerShannonStrategy<Islet<Vector2I>> agent = new(islandGraph)
+            {
+                DataToString = IsletToString
+            };
             spanningTrees = agent.GetSpanningTrees();
 
             if (debugWrite) 

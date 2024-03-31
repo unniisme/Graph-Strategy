@@ -22,6 +22,14 @@ namespace Graphs
     /// <typeparam name="T"></typeparam>
     public class Graph<T>
     {
+        private static int uid = 0;
+        private static int UIDgen
+        {
+            get {uid += 1; return uid;}
+        }
+
+        public int UID = UIDgen;
+
         public HashSet<Node<T>> Nodes { get; } = new HashSet<Node<T>>();
         public HashSet<Edge<T>> Edges { get; } = new HashSet<Edge<T>>();
 
@@ -75,7 +83,7 @@ namespace Graphs
             Edges.Add(newEdge);
         }
 
-        public void AddEdge(T fromData, T toData, T edgeData)
+        public virtual void AddEdge(T fromData, T toData, T edgeData)
         {
             AddEdge(DataNodeMap[fromData], DataNodeMap[toData], edgeData);
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Graphs.Search;
 using Graphs.Utils;
+using Logging;
 
 namespace Graphs.Shannon
 {
@@ -10,38 +11,34 @@ namespace Graphs.Shannon
     {
         private readonly Graph<T> graph;
         private readonly SpanningTree<T> spanningTreeA = new();
-
         private readonly SpanningTree<T> spanningTreeB = new();
+        private readonly Dictionary<T,int> edgeToSpanningTree = new();
+        public Func<T,string> DataToString {get; set;}
 
         private List<SpanningTree<T>> SpanningTrees => new() {
             spanningTreeA,
             spanningTreeB
         };
 
+        private static int OtherIndex(int i) => (i+1)%2;
+
         public TwoPlayerShannonStrategy(Graph<T> graph)
         {
             this.graph = graph;
 
-            // Initialize spanning trees
-            foreach (Node<T> node in graph.Nodes)
-            {
-                foreach (SpanningTree<T> sp in SpanningTrees)
-                {
-                    sp.AddNode(node.Data);
-                }
-            }
+            Logger.Inform("Initializing");
         }
 
-        int currTree = 0;
         private bool TryGrowSpanningTrees(Edge<T> edge)
         {
             // Case 0: if edge can be added to either st
-            // Note, this case should be a subset of the next case
             foreach (SpanningTree<T> sp in SpanningTrees)
             {
                 if (!sp.VertexSet.Find(edge.FromNode.Data).Equals(sp.VertexSet.Find(edge.ToNode.Data)))
                 {
-                    sp.AddEdge(edge.FromNode, edge.ToNode, edge.Data);
+                    sp.AddEdge(edge.FromNode.Data, edge.ToNode.Data, edge.Data);
+                    edgeToSpanningTree[edge.Data] = SpanningTrees.IndexOf(sp);
+                    Logger.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {SpanningTrees.IndexOf(sp)}");
                     return true;
                 }
             }
@@ -56,56 +53,150 @@ namespace Graphs.Shannon
                     auxillaryEdgeGraph.AddNode(e.Data);
             }
 
-            BFS<T> auxillarySearch = new(auxillaryEdgeGraph)
-            {
-                GetAdjList = (T data) 
-                    => 
-                        {
-                            Edge<T> edge = graph.DataEdgeMap[data];
-                            DFS<T> findCycle = new(SpanningTrees[currTree])
-                            {
-                                Start = edge.FromNode.Data,
-                                Target = (e) => e.Equals(edge.ToNode.Data)
-                            };
-                            findCycle.Update();
-                            currTree = (currTree + 1)%2;
-                            return findCycle.GetPathEdges();
-                        },
-                Start = edge.Data,
-                Target = (T edgeData)
-                    =>
-                        {
-                            DSU<T> vs = SpanningTrees[currTree].VertexSet;
-                            Edge<T> edge = graph.DataEdgeMap[edgeData];
-                            return !vs.Find(edge.FromNode.Data).Equals(vs.Find(edge.ToNode.Data));
-                        }
-            };
+            int startIndex = 0;
+            BFS<T> auxillarySearch = RunAuxillarySearch(auxillaryEdgeGraph, edge, startIndex);
             
-            auxillarySearch.Update();
-
-            if (!auxillarySearch.Reachable) return false;
+            if (!auxillarySearch.Reachable)
+            {
+                startIndex = OtherIndex(startIndex);
+                auxillarySearch = RunAuxillarySearch(auxillaryEdgeGraph, edge, startIndex);
+                if (!auxillarySearch.Reachable)
+                {
+                    return false;
+                }
+            }
 
             foreach (Node<T> auxNode in auxillarySearch.GetPathNodes())
             {
                 T edgeData = auxNode.Data;
 
-                SpanningTree<T> currSP = SpanningTrees[currTree];
-                SpanningTree<T> otherSP = SpanningTrees[(currTree+1)%2];
+                SpanningTree<T> currSP = SpanningTrees[edgeToSpanningTree[edgeData]];
+                SpanningTree<T> otherSP = SpanningTrees[OtherIndex(edgeToSpanningTree[edgeData])];
 
                 currSP.RemoveEdge(currSP.DataEdgeMap[edgeData]);
-                otherSP.AddEdge(graph.DataEdgeMap[edgeData].FromNode, graph.DataEdgeMap[edgeData].ToNode, edgeData);
-
-                currTree = (currTree+1)%2;
+                Logger.Inform($"Removing Edge {DataToString(edgeData)} from Spanning Tree {edgeToSpanningTree[edgeData]}");
+                otherSP.AddEdge(graph.DataEdgeMap[edgeData].FromNode.Data, graph.DataEdgeMap[edgeData].ToNode.Data, edgeData);
+                edgeToSpanningTree[edgeData] = OtherIndex(edgeToSpanningTree[edgeData]);
+                Logger.Inform($"Adding Edge {DataToString(edgeData)} to Spanning Tree {OtherIndex(edgeToSpanningTree[edgeData])}");
             }
-            SpanningTrees[currTree].AddEdge(edge.FromNode, edge.ToNode, edge.Data);
+            SpanningTrees[startIndex].AddEdge(edge.FromNode.Data, edge.ToNode.Data, edge.Data);
+            edgeToSpanningTree[edge.Data] = startIndex;
+            Logger.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {startIndex}");
 
             return true;
 
         }
+
+        private class AuxillarySearch<t> : BFS<t>
+        {
+            readonly int startWith = 0;
+            readonly TwoPlayerShannonStrategy<t> strategy;
+
+            public AuxillarySearch(TwoPlayerShannonStrategy<t> strategy, 
+                                    SpanningTree<t> auxillaryGraph,
+                                    int startWith = 0) : base(auxillaryGraph)
+            {
+                this.strategy = strategy;
+                this.startWith = startWith;
+            }
+
+            public override void Update()
+            {
+                searchDict = new();
+                searchTree = new();
+                parentEdge = null; // No parent backtracking
+
+                end = Start;
+
+                ISearchCollection<t> frontier = GetFrontier();
+                frontier.Add(Start);
+                searchTree.AddNode(Start);
+                searchDict[Start] = Start;
+
+                while (!frontier.IsEmpty())
+                {
+                    t curr = frontier.Pop();
+
+                    if (Target(curr))
+                    {
+                        Reachable = true;
+                        end = curr;
+                        return;
+                    }
+
+                    // ---- Expansion policy to find neighbors in auxillary graph-----------
+                    Edge<t> edge = strategy.graph.DataEdgeMap[curr];
+
+                    int currTree = strategy.edgeToSpanningTree.ContainsKey(curr)?
+                                OtherIndex(strategy.edgeToSpanningTree[curr]):
+                                startWith;
+
+                    Logger.Debug($"Expanding {strategy.DataToString(curr)} in tree {currTree}");
+
+                    DFS<t> findCycle = new(strategy.SpanningTrees[currTree])
+                    {
+                        Start = edge.FromNode.Data,
+                        Target = (e) => e.Equals(edge.ToNode.Data)
+                    };
+                    findCycle.Update();
+                    List<Edge<t>> pathEdges = findCycle.GetPathEdges();
+                    Logger.Debug($"Result :\n {string.Join("\n", pathEdges.ConvertAll((e) => strategy.DataToString(e.Data)))}");
+
+                    foreach (Edge<t> neighbor in pathEdges)
+                    {
+                        t toData = neighbor.Data;
+                        if (!searchDict.ContainsKey(toData))
+                        {
+                            frontier.Add(toData);
+                            searchTree.AddNode(toData);
+                            searchTree.AddEdge(curr, toData, edge.Data);
+                            searchDict[toData] = curr;
+                        }
+                    }
+                }
+            }
+        }
+        private BFS<T> RunAuxillarySearch(SpanningTree<T> auxillaryGraph, Edge<T> edge, int startWith = 0)
+        {
+            AuxillarySearch<T> auxillarySearch = new(this, auxillaryGraph, startWith)
+            {
+                Start = edge.Data,
+                Target = (T edgeData)
+                    =>
+                        {
+                            Logger.Debug($"Checking target for {DataToString(edgeData)}");
+                            int currTree = edgeToSpanningTree.ContainsKey(edgeData)?
+                                        OtherIndex(edgeToSpanningTree[edgeData]):
+                                        startWith;
+
+                            DSU<T> vs = SpanningTrees[currTree].VertexSet;
+                            Edge<T> edge = graph.DataEdgeMap[edgeData];
+                            bool res = !vs.Find(edge.FromNode.Data).Equals(vs.Find(edge.ToNode.Data));
+                            Logger.Debug($"Result : {res}");
+                            return res;
+                        }
+            };
+            auxillarySearch.Update();
+
+            return auxillarySearch;
+        }
         public Tuple<List<Edge<T>>, List<Edge<T>>> GetSpanningTrees()
         {
+            // Initialize spanning trees
+            foreach (Node<T> node in graph.Nodes)
+            {
+                Logger.Debug($"Node : {DataToString(node.Data)}");
+
+                foreach (SpanningTree<T> sp in SpanningTrees)
+                {
+                    sp.AddNode(node.Data);
+                }
+            }
+
             foreach (Edge<T> edge in graph.DataEdgeMap.Values)
             {
+                Logger.Debug($"Adding Edge : {DataToString(edge.Data)}");
+
                 TryGrowSpanningTrees(edge);
             }
             return new(spanningTreeA.Edges.ToList(), spanningTreeB.Edges.ToList());

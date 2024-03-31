@@ -5,32 +5,24 @@ namespace Graphs.Search
 {
     public class SimpleSearch<T> : ISearchAlgorithm<T>
     {
-        private Graph<T> searchTree;
-        private Dictionary<T,T> searchDict;
-        private Dictionary<T, Edge<T>> parentEdge;
-        private Func<T, IEnumerable<Edge<T>>> getAdjList = null;
+        internal Graph<T> searchTree;
+        internal Dictionary<T,T> searchDict;
+        internal Dictionary<T, Edge<T>> parentEdge;
+        internal Func<T, IEnumerable<Edge<T>>> getAdjList = null;
 
 
-        private readonly Graph<T> graph;
+        internal readonly Graph<T> graph;
 
         public T Start {get; set;}
         public Func<T,bool> Target {get; set;} = (data) => false;
-        private T end = default;
+        internal T end = default;
 
-        public bool Reachable {get; private set;}
+        public bool Reachable {get; internal set;}
 
         public Graph<T> SearchTree => searchTree;
 
         public Dictionary<T, T> SearchTreeDict => searchDict;
 
-        public Func<T, IEnumerable<Edge<T>>> GetAdjList 
-        {
-            set => getAdjList = value;
-            get
-            {
-                return getAdjList??((data) => graph.DataNodeMap[data].AdjList);
-            }
-        }
         public List<Edge<T>> GetPathEdges()
         {
             List<Edge<T>> outList = new();
@@ -63,7 +55,7 @@ namespace Graphs.Search
 
         public virtual ISearchCollection<T> GetFrontier() => new SearchQueue<T>();
 
-        public void Update()
+        public virtual void Update()
         {
             searchDict = new();
             searchTree = new();
@@ -71,14 +63,17 @@ namespace Graphs.Search
 
             end = Start;
 
-            foreach (Node<T> node in graph.Nodes)
-            {
-                searchTree.AddNode(node.Data);
-                searchDict[node.Data] = default;
-            }
+            // foreach (Node<T> node in graph.Nodes)
+            // {
+            //     searchTree.AddNode(node.Data);
+            //     searchDict[node.Data] = default;
+            // }
 
             ISearchCollection<T> frontier = GetFrontier();
             frontier.Add(Start);
+            searchTree.AddNode(Start);
+            searchDict[Start] = Start;
+            parentEdge[Start] = null;
 
             while (!frontier.IsEmpty())
             {
@@ -91,18 +86,13 @@ namespace Graphs.Search
                     return;
                 }
 
-                if (searchDict.ContainsKey(curr)) continue;
-
-                searchTree.AddNode(curr);
-                searchDict[curr] = default;
-                parentEdge[curr] = null;
-
-                foreach (Edge<T> edge in GetAdjList(curr))
+                foreach (Edge<T> edge in graph.DataNodeMap[curr].AdjList)
                 {
                     T toData = edge.ToNode.Data;
                     if (!searchDict.ContainsKey(toData))
                     {
                         frontier.Add(toData);
+                        searchTree.AddNode(toData);
                         searchTree.AddEdge(curr, toData, edge.Data);
                         searchDict[toData] = curr;
                         parentEdge[toData] = edge;
