@@ -26,7 +26,10 @@ namespace Gamelogic.Managers
         public bool debugDrawSpanningTrees = true;
 
         [Export]
-        public Node2D gridSeachStartTarget;
+        public Node2D shortSpot;
+        [Export]
+
+        public Node2D cutSpot;
 
         public void Debug()
         {
@@ -42,18 +45,24 @@ namespace Gamelogic.Managers
         public static string IsletToString(Islet<Vector2I> graph)
         {
             string isIsland = graph.IsIsland?"Island":"Bridge";
+            List<Vector2I> nodes = IsletToGridPositions(graph);
+            return $"[{graph.UID}] {isIsland} {{ {string.Join(",", nodes)} }}";
+        }
+
+        private static List<Vector2I> IsletToGridPositions(Islet<Vector2I> islet)
+        {
             List<Vector2I> nodes = new();
-            foreach (Node<Vector2I> node in graph.Nodes)
+            foreach (Node<Vector2I> node in islet.Nodes)
             {
                 nodes.Add(node.Data);
             }
-            return $"[{graph.UID}] {isIsland} {{ {string.Join(",", nodes)} }}";
+            return nodes;
         }
 
         public void CalculateIslands()
         {
             grid ??= GameManager.GetLevel().grid;
-            Vector2I pos = grid.GameCoordinateToGridCoordinate(gridSeachStartTarget.Position);
+            Vector2I pos = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
 
             gridGraph = new(grid, pos);
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]);
@@ -62,10 +71,39 @@ namespace Gamelogic.Managers
             {
                 DataToString = IsletToString
             };
-            spanningTrees = agent.GetSpanningTrees();
+
+
+            Vector2I shortGridSpot = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
+            Vector2I cutGridSpot = grid.GameCoordinateToGridCoordinate(cutSpot.Position);
+            spanningTrees = agent.GetSpanningTrees(FindIslet(shortGridSpot), FindIslet(cutGridSpot));
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
+        }
+
+        private Islet<Vector2I> FindIslet(Vector2I gridPos, bool isIsland = true)
+        {
+            if (isIsland)
+            {
+                foreach (Node<Islet<Vector2I>> island in islandGraph.Nodes)
+                {
+                    if (IsletToGridPositions(island.Data).Contains(gridPos))
+                    {
+                        return island.Data;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Edge<Islet<Vector2I>> bridge in islandGraph.Edges)
+                {
+                    if (IsletToGridPositions(bridge.Data).Contains(gridPos))
+                    {
+                        return bridge.Data;
+                    }
+                }
+            }
+            throw new GridException("Position not in any islet", gridPos);
         }
 
         private void DrawIslands()

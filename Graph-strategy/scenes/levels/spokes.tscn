@@ -59,10 +59,9 @@ Offset = Vector2(32, 32)
 
 [node name="Goblins" type="Node2D" parent="."]
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("gridSeachStartTarget")]
+[node name="GraphManager" type="Node2D" parent="."]
 script = ExtResource("5_1bbcx")
 debugDraw = true
-gridSeachStartTarget = NodePath("ExpandTarget")
 
 [node name="ExpandTarget" type="Node2D" parent="GraphManager"]
 position = Vector2(800, -24)

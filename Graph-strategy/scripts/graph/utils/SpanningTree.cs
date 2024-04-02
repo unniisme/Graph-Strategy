@@ -35,7 +35,7 @@ namespace Graphs.Utils
             }
             base.RemoveEdge(edge);
 
-            // Remove backedge, as unweightedness is simulated by a bygraph
+            // Remove backedge, as undirectedness is simulated by a bygraph
             foreach (Edge<T> e in edge.ToNode.AdjList.ToArray())
             {
                 if (e.Data.Equals(edge.Data) && e.ToNode.Data.Equals(edge.FromNode.Data))
@@ -47,10 +47,17 @@ namespace Graphs.Utils
 
         public override void RemoveNode(Node<T> node)
         {
+            foreach (Edge<T> edge in node.AdjList.ToArray())
+            {
+                if (DataEdgeMap.ContainsKey(edge.Data))
+                    RemoveEdge(DataEdgeMap[edge.Data]);
+            }
+            Nodes.Remove(node);
+            DataNodeMap.Remove(node.Data);
+
             VertexSet.parent.Remove(node.Data);
             VertexSet.rank.Remove(node.Data);
-
-            base.RemoveNode(node);
         }
+        
     }
 }

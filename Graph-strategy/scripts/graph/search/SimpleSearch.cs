@@ -63,11 +63,6 @@ namespace Graphs.Search
 
             end = Start;
 
-            // foreach (Node<T> node in graph.Nodes)
-            // {
-            //     searchTree.AddNode(node.Data);
-            //     searchDict[node.Data] = default;
-            // }
 
             ISearchCollection<T> frontier = GetFrontier();
             frontier.Add(Start);

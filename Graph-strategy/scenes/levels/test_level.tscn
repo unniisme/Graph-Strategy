@@ -79,10 +79,9 @@ position = Vector2(800, 32)
 [node name="RedSoldier3" parent="Goblins" instance=ExtResource("6_k1nba")]
 position = Vector2(800, 96)
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("gridSeachStartTarget")]
+[node name="GraphManager" type="Node2D" parent="."]
 script = ExtResource("5_iqhng")
 debugDraw = true
-gridSeachStartTarget = NodePath("ExpandTarget")
 
 [node name="ExpandTarget" type="Node2D" parent="GraphManager"]
 position = Vector2(592, 32)
