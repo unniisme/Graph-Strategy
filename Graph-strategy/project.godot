@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Graph-strategy"
-run/main_scene="res://scenes/levels/Muligraph0.tscn"
+run/main_scene="res://scenes/levels/test_level.tscn"
 config/features=PackedStringArray("4.2", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -31,6 +31,7 @@ project/assembly_name="Graph-strategy"
 
 folder_colors={
 "res://assets/": "purple",
+"res://log/": "gray",
 "res://resources/": "blue",
 "res://scenes/": "yellow",
 "res://scripts/": "green"

@@ -19,7 +19,7 @@ namespace Logging
     /// </summary>
     public static class Logger
     {
-        private static LogLevel s_logLevel = LogLevel.INFO;
+        private static LogLevel s_logLevel = LogLevel.DEBUG;
 
         /// <summary>
         /// Start a new logger instance with given team name
@@ -28,6 +28,8 @@ namespace Logging
         static Logger()
         {
             LogWriter.StartThread(); // Initialize thread for writing log
+
+            LogWriter.SetLogFile($"log/graphGame.{DateTime.Now.Ticks}.log");
         }
 
         /// <summary>

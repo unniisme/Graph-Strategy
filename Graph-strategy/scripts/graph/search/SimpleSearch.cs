@@ -51,16 +51,21 @@ namespace Graphs.Search
         public SimpleSearch(Graph<T> graph)
         {
             this.graph = graph;
+
+            Clear();
         }
 
         public virtual ISearchCollection<T> GetFrontier() => new SearchQueue<T>();
 
-        public virtual void Update()
+        public virtual void Clear()
         {
             searchDict = new();
             searchTree = new();
             parentEdge = new();
+        }
 
+        public virtual void Update()
+        {
             end = Start;
 
 

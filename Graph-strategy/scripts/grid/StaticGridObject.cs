@@ -4,6 +4,7 @@ using Godot;
 
 namespace Gamelogic.Objects
 {
+	[GlobalClass]
     public partial class StaticGridObject : Node2D, IGridObject
     {
         [Export]

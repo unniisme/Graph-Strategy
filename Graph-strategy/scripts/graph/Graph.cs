@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Graphs.Utils;
 namespace Graphs
 {
     public class Node<T>
@@ -28,7 +29,7 @@ namespace Graphs
             get {uid += 1; return uid;}
         }
 
-        public int UID = UIDgen;
+        public int UID {get;} = UIDgen;
 
         public HashSet<Node<T>> Nodes { get; } = new HashSet<Node<T>>();
         public HashSet<Edge<T>> Edges { get; } = new HashSet<Edge<T>>();

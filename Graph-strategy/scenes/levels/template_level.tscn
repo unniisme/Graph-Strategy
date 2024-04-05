@@ -59,12 +59,15 @@ Offset = Vector2(32, 32)
 
 [node name="Goblins" type="Node2D" parent="."]
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("gridSeachStartTarget")]
+[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot")]
 script = ExtResource("5_ljex1")
 debugDraw = true
-gridSeachStartTarget = NodePath("ExpandTarget")
+shortSpot = NodePath("ShortSpot")
+cutSpot = NodePath("CutSpot")
 
-[node name="ExpandTarget" type="Node2D" parent="GraphManager"]
+[node name="ShortSpot" type="Node2D" parent="GraphManager"]
+
+[node name="CutSpot" type="Node2D" parent="GraphManager"]
 
 [node name="Phantoms" type="Node2D" parent="."]
 

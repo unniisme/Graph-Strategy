@@ -15,6 +15,7 @@ namespace Gamelogic.Managers
         private IGrid grid = null;
         private Graph<Islet<Vector2I>> islandGraph = null;
         private Tuple<List<Edge<Islet<Vector2I>>>, List<Edge<Islet<Vector2I>>>> spanningTrees = null;
+        private IShannonStrategy<Islet<Vector2I>> shannonStrategy;
 
         bool draw = false;
 
@@ -31,6 +32,9 @@ namespace Gamelogic.Managers
 
         public Node2D cutSpot;
 
+        BuildPhantom cutPhantom; // blue
+        BuildPhantom shortPhantom; // red
+
         public void Debug()
         {
             if (grid == null)
@@ -44,6 +48,8 @@ namespace Gamelogic.Managers
 
         public static string IsletToString(Islet<Vector2I> graph)
         {
+            if (graph == null) return "null";
+
             string isIsland = graph.IsIsland?"Island":"Bridge";
             List<Vector2I> nodes = IsletToGridPositions(graph);
             return $"[{graph.UID}] {isIsland} {{ {string.Join(",", nodes)} }}";
@@ -59,6 +65,17 @@ namespace Gamelogic.Managers
             return nodes;
         }
 
+        public override void _Ready()
+        {
+            cutPhantom = GameManager.GetLevel().phantoms[0];
+            cutPhantom.TurnedOff += MakeCutMove;
+
+            shortPhantom = GameManager.GetLevel().phantoms[1];
+            shortPhantom.TurnedOff += MakeShortMove;
+
+            CalculateIslands();
+        }
+
         public void CalculateIslands()
         {
             grid ??= GameManager.GetLevel().grid;
@@ -71,7 +88,7 @@ namespace Gamelogic.Managers
             {
                 DataToString = IsletToString
             };
-
+            shannonStrategy = agent;
 
             Vector2I shortGridSpot = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
             Vector2I cutGridSpot = grid.GameCoordinateToGridCoordinate(cutSpot.Position);
@@ -79,6 +96,25 @@ namespace Gamelogic.Managers
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
+        }
+
+        private void MakeShortMove()
+        {
+            Vector2I pos = shortPhantom.GridPosition;
+            Islet<Vector2I> moveBridge = FindIslet(pos, false);
+            if (moveBridge == null) return;
+            shannonStrategy.Short(moveBridge);
+        }
+
+        private void MakeCutMove()
+        {
+            Vector2I pos = cutPhantom.GridPosition;
+            Islet<Vector2I> moveBridge = FindIslet(pos, false);
+            if (moveBridge == null) return;
+            shannonStrategy.Cut(moveBridge);
+
+            Islet<Vector2I> shortMove = shannonStrategy.GetShortMove();
+            GD.Print(IsletToString(shortMove));
         }
 
         private Islet<Vector2I> FindIslet(Vector2I gridPos, bool isIsland = true)
@@ -103,7 +139,7 @@ namespace Gamelogic.Managers
                     }
                 }
             }
-            throw new GridException("Position not in any islet", gridPos);
+            return null;
         }
 
         private void DrawIslands()

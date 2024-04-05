@@ -184,7 +184,7 @@ namespace Graphs.Shannon
                                         OtherIndex(edgeToSpanningTree[edgeData]):
                                         startWith;
 
-                            DSU<T> vs = SpanningTrees[currTree].VertexSet;
+                            IDSU<T> vs = SpanningTrees[currTree].VertexSet;
                             Edge<T> edge = graph.DataEdgeMap[edgeData];
                             bool res = !vs.Find(edge.FromNode.Data).Equals(vs.Find(edge.ToNode.Data));
 
@@ -222,12 +222,16 @@ namespace Graphs.Shannon
 
             AssertSTExistance(a, b);
             
+            Logger.Debug("Tree A");
+
+            Logger.Debug("Tree B");
 
             return new(spanningTreeA.Edges.ToList(), spanningTreeB.Edges.ToList());
         }
 
         private void AssertSTExistance(T a, T b)
         {
+            SpanningTreesExist = true;
             // Check if proper spanning trees have been found
             foreach (SpanningTree<T> sp in SpanningTrees)
             {
@@ -240,6 +244,8 @@ namespace Graphs.Shannon
             {
                 SpanningTreesExist = false;
             }
+
+            Logger.Inform($"Spanning tree existance : {SpanningTreesExist}");
         }
 
         private void ExtractIntersection()
@@ -284,7 +290,7 @@ namespace Graphs.Shannon
             }
             else
             {
-                throw new GraphException<T>("Edge not present in either spanningTree", spanningTreeA);
+                Logger.Warn("Edge not present in either spanningTree");
             }
         }
 
@@ -301,7 +307,7 @@ namespace Graphs.Shannon
             }
             else
             {
-                throw new GraphException<T>("Edge not present in either spanningTree", spanningTreeA);
+                Logger.Warn("Edge not present in either spanningTree");
             }
         }
 
@@ -310,38 +316,55 @@ namespace Graphs.Shannon
             if (!SpanningTreesExist)
             {
                 // For now random move
-                return spanningTreeA.Nodes.ElementAt(0).Data;
+                return default;
             }
 
             foreach (T cutEdgeData in cutEdges)
             {
                 if (spanningTreeA.DataEdgeMap.ContainsKey(cutEdgeData))
                 {
-                    spanningTreeA.RemoveEdge(spanningTreeA.DataEdgeMap[cutEdgeData]);
-                    return FindShortEdge(1);
+                    return FindShortEdge(1, cutEdgeData);
                 }
                 else if (spanningTreeB.DataEdgeMap.ContainsKey(cutEdgeData))
                 {
-                    spanningTreeB.RemoveEdge(spanningTreeB.DataEdgeMap[cutEdgeData]);
-                    return FindShortEdge(0);
+                    return FindShortEdge(0, cutEdgeData);
                 }
             }
 
-            return spanningTreeA.Nodes.ElementAt(0).Data;
+            return default;
         }
 
-        private T FindShortEdge(int tree)
+        private T FindShortEdge(int tree, T cutEdgeData)
         {
-            DSU<T> otherVS = SpanningTrees[OtherIndex(tree)].VertexSet;
+            SpanningTree<T> otherST = SpanningTrees[OtherIndex(tree)]; 
+            Edge<T> removedEdge = otherST.DataEdgeMap[cutEdgeData];
+            otherST.RemoveEdge(otherST.DataEdgeMap[cutEdgeData]);
+            
+            BFS<T> spanningTreeSearch = new(otherST)
+            {
+                Start = removedEdge.FromNode.Data,
+                Target = (_) => false,
+            };
+            spanningTreeSearch.Update();
+            spanningTreeSearch.Start = removedEdge.ToNode.Data;
+            spanningTreeSearch.Update();
+
+            Dictionary<T,T> otherVS = spanningTreeSearch.searchDict;
+            
             foreach (Edge<T> e in SpanningTrees[tree].Edges)
             {
                 if (shortedEdges.Contains(e.Data) || cutEdges.Contains(e.Data))
                     continue;
 
-                if (!otherVS.Find(e.FromNode.Data).Equals(otherVS.Find(e.ToNode.Data)))
+                if (!DSU<T>.CustomFind(e.FromNode.Data, otherVS).Equals(DSU<T>.CustomFind(e.ToNode.Data, otherVS)))
+                {
+                    otherST.AddEdge(e.FromNode.Data, e.ToNode.Data, cutEdgeData);
+                    cutEdges.Remove(cutEdgeData);
                     return e.Data;
+                }
             }
-            return spanningTreeA.Nodes.ElementAt(0).Data;
+            otherST.AddEdge(removedEdge.FromNode.Data, removedEdge.ToNode.Data, cutEdgeData);
+            return default;
         }
     }
 }

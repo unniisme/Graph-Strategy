@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Graphs.Utils
 {
-    public class DSU<T>
+    public class DSU<T> : IDSU<T>
     {
         internal readonly Dictionary<T, T> parent;
         internal readonly Dictionary<T, int> rank;
@@ -26,6 +26,21 @@ namespace Graphs.Utils
                 parent[element] = element;
                 rank[element] = 0;
             }
+        }
+
+        public static T CustomFind(T element, Dictionary<T,T> parentDict)
+        {
+            if (!parentDict.ContainsKey(element))
+            {
+                throw new ArgumentException("Element does not exist in the DSU.");
+            }
+
+            if (!parentDict[element].Equals(element))
+            {
+                parentDict[element] = CustomFind(parentDict[element], parentDict);
+            }
+
+            return parentDict[element];
         }
 
         public T Find(T element)

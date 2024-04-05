@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Logging;
+
 namespace Graphs.Utils
 {
     /// <summary>
@@ -6,7 +9,7 @@ namespace Graphs.Utils
     /// <typeparam name="T"></typeparam>
     public class SpanningTree<T> : Graph<T>
     {
-        public DSU<T> VertexSet {get;set;} = new();
+        public DSU<T> VertexSet {get;} = new();
 
         public override Node<T> AddNode(T data)
         {
@@ -25,14 +28,6 @@ namespace Graphs.Utils
 
         public override void RemoveEdge(Edge<T> edge)
         {
-            if (VertexSet.parent[edge.FromNode.Data].Equals(edge.ToNode.Data))
-            {
-                VertexSet.parent[edge.FromNode.Data] = edge.FromNode.Data; 
-            }
-            else if (VertexSet.parent[edge.ToNode.Data].Equals(edge.FromNode.Data))
-            {
-                VertexSet.parent[edge.ToNode.Data] = edge.ToNode.Data; 
-            }
             base.RemoveEdge(edge);
 
             // Remove backedge, as undirectedness is simulated by a bygraph
@@ -56,7 +51,6 @@ namespace Graphs.Utils
             DataNodeMap.Remove(node.Data);
 
             VertexSet.parent.Remove(node.Data);
-            VertexSet.rank.Remove(node.Data);
         }
         
     }

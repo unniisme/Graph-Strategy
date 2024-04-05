@@ -22,7 +22,7 @@ namespace Gamelogic.Managers
         public Soldier selectedSoldier = null;
 
         [Export]
-        public BuildPhantom[] phantoms;
+        public BuildPhantom[] phantoms; // Blue followed by red
 
         [Export]
         public int totalMoves = 5;
