@@ -15,7 +15,7 @@ namespace Graphs.Shannon
         private readonly Dictionary<T,int> edgeToSpanningTree = new();
         private readonly HashSet<T> shortedEdges = new();
         private readonly HashSet<T> cutEdges = new();
-        public Func<T,string> DataToString {get; set;}
+        public Func<T,string> DataToString {get; set;} = (t) => $"{t}";
         
         public bool SpanningTreesExist {get; private set;} = false;
 
@@ -230,11 +230,14 @@ namespace Graphs.Shannon
         {
             SpanningTreesExist = true;
             // Check if proper spanning trees have been found
-            foreach (SpanningTree<T> sp in SpanningTrees)
+            if (a != null && b != null)
             {
-                if (!sp.VertexSet.Find(a).Equals(sp.VertexSet.Find(b)))
+                foreach (SpanningTree<T> sp in SpanningTrees)
                 {
-                    SpanningTreesExist = false;
+                    if (!sp.VertexSet.Find(a).Equals(sp.VertexSet.Find(b)))
+                    {
+                        SpanningTreesExist = false;
+                    }
                 }
             }
             if (spanningTreeA.Edges.Count != spanningTreeB.Edges.Count)

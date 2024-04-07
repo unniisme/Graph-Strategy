@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Gamelogic.Grid;
 using Gamelogic.Grid.Graph;
 using Godot;
 using Graphs;
 using Graphs.Shannon;
+using Logging;
 
 namespace Gamelogic.Managers
 {
@@ -12,10 +14,14 @@ namespace Gamelogic.Managers
     public partial class GraphManager : Node2D
     {
         private NavigationGridGraph gridGraph = null;
+        private DualGridGraph gridGraphDual = null;
         private IGrid grid = null;
         private Graph<Islet<Vector2I>> islandGraph = null;
+        private Graph<Islet<Vector2I>> islandGraphDual = null;
         private Tuple<List<Edge<Islet<Vector2I>>>, List<Edge<Islet<Vector2I>>>> spanningTrees = null;
-        private IShannonStrategy<Islet<Vector2I>> shannonStrategy;
+        private Tuple<List<Edge<Islet<Vector2I>>>, List<Edge<Islet<Vector2I>>>> spanningTreesDual = null;
+        private IShannonStrategy<Islet<Vector2I>> shannonStrategyShort;
+        private IShannonStrategy<Islet<Vector2I>> shannonStrategyCut;
 
         bool draw = false;
 
@@ -84,15 +90,30 @@ namespace Gamelogic.Managers
             gridGraph = new(grid, pos);
             islandGraph = IslandBridgeAlgorithm<Vector2I>.GetIslandBridgeGraph(gridGraph.DataNodeMap[pos]);
 
-            TwoPlayerShannonStrategy<Islet<Vector2I>> agent = new(islandGraph)
+            gridGraphDual = new(grid, islandGraph);
+            Vector2I dualPos = gridGraphDual.DataNodeMap.Keys.First();
+            islandGraphDual = DualIslandBridgeAlgorithm.GetIslandBridgeGraph(gridGraphDual.DataNodeMap[dualPos], islandGraph);
+
+            foreach (Islet<Vector2I> islet in islandGraphDual.DataNodeMap.Keys)
+            {
+                Logger.Debug(IsletToString(islet));
+            }
+
+
+            shannonStrategyShort = new TwoPlayerShannonStrategy<Islet<Vector2I>>(islandGraph)
             {
                 DataToString = IsletToString
             };
-            shannonStrategy = agent;
+            shannonStrategyCut = new TwoPlayerShannonStrategy<Islet<Vector2I>>(islandGraphDual)
+            {
+                DataToString = IsletToString
+            };
 
             Vector2I shortGridSpot = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
             Vector2I cutGridSpot = grid.GameCoordinateToGridCoordinate(cutSpot.Position);
-            spanningTrees = agent.GetSpanningTrees(FindIslet(shortGridSpot), FindIslet(cutGridSpot));
+
+            spanningTrees = shannonStrategyShort.GetSpanningTrees(FindIslet(islandGraph, shortGridSpot), FindIslet(islandGraph, cutGridSpot));
+            spanningTreesDual = shannonStrategyCut.GetSpanningTrees(null, null);
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
@@ -101,23 +122,28 @@ namespace Gamelogic.Managers
         private void MakeShortMove()
         {
             Vector2I pos = shortPhantom.GridPosition;
-            Islet<Vector2I> moveBridge = FindIslet(pos, false);
+            Islet<Vector2I> moveBridge = FindIslet(islandGraph, pos, false);
             if (moveBridge == null) return;
-            shannonStrategy.Short(moveBridge);
+            shannonStrategyShort.Short(moveBridge);
+            shannonStrategyCut.Cut(moveBridge);
+
+            Islet<Vector2I> cutMove = shannonStrategyCut.GetShortMove();
+            GD.Print($"Cut Move : {IsletToString(cutMove)}");
         }
 
         private void MakeCutMove()
         {
             Vector2I pos = cutPhantom.GridPosition;
-            Islet<Vector2I> moveBridge = FindIslet(pos, false);
+            Islet<Vector2I> moveBridge = FindIslet(islandGraph, pos, false);
             if (moveBridge == null) return;
-            shannonStrategy.Cut(moveBridge);
+            shannonStrategyShort.Cut(moveBridge);
+            shannonStrategyCut.Short(moveBridge);
 
-            Islet<Vector2I> shortMove = shannonStrategy.GetShortMove();
-            GD.Print(IsletToString(shortMove));
+            Islet<Vector2I> shortMove = shannonStrategyShort.GetShortMove();
+            GD.Print($"Short Move : {IsletToString(shortMove)}");
         }
 
-        private Islet<Vector2I> FindIslet(Vector2I gridPos, bool isIsland = true)
+        private Islet<Vector2I> FindIslet(Graph<Islet<Vector2I>> islandGraph, Vector2I gridPos, bool isIsland = true)
         {
             if (isIsland)
             {
@@ -144,12 +170,12 @@ namespace Gamelogic.Managers
 
         private void DrawIslands()
         {
-            foreach (Islet<Vector2I> islet in islandGraph.DataNodeMap.Keys)
+            foreach (Islet<Vector2I> islet in islandGraphDual.DataNodeMap.Keys)
             {
                 DrawIslet(islet, 5, Colors.Green);
                 
             }
-            foreach (Edge<Islet<Vector2I>> edge in islandGraph.Edges)
+            foreach (Edge<Islet<Vector2I>> edge in islandGraphDual.Edges)
             {
                 DrawIslet(edge.Data, 3, Colors.Red);
             }
@@ -195,14 +221,14 @@ namespace Gamelogic.Managers
             {
                 if (debugDraw)
                 {
-                    DrawGraph(gridGraph, 4, Colors.Blue);
+                    DrawGraph(gridGraphDual, 4, Colors.Blue);
                     DrawIslands();
                 }
 
                 if (debugDrawSpanningTrees)
                 {
-                    DrawEdges(spanningTrees.Item1, 10,  Colors.GreenYellow);
-                    DrawEdges(spanningTrees.Item2, 10,  Colors.BlanchedAlmond);
+                    DrawEdges(spanningTreesDual.Item1, 10,  Colors.GreenYellow);
+                    DrawEdges(spanningTreesDual.Item2, 10,  Colors.BlanchedAlmond);
                 }
             }
 
