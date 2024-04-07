@@ -1,57 +1,67 @@
-[gd_scene load_steps=9 format=3 uid="uid://bciknlhidtuqn"]
+[gd_scene load_steps=10 format=3 uid="uid://bciknlhidtuqn"]
 
+[ext_resource type="Script" path="res://scripts/grid/StaticGridObject.cs" id="1_3lj6g"]
 [ext_resource type="Texture2D" uid="uid://d2qaffv18oc7c" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/Resources/Trees/Tree.png" id="1_y0n0e"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0g1v0"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_btyhc"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(0, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2mm0k"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_do37j"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(192, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ckuk1"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_cda41"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(384, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_cucnv"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_i6knb"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(576, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_8g61b"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_fbbgx"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(0, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0hte2"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_03qa1"]
 atlas = ExtResource("1_y0n0e")
 region = Rect2(192, 192, 192, 192)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_x4m52"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_h6gix"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0g1v0")
+"texture": SubResource("AtlasTexture_btyhc")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2mm0k")
+"texture": SubResource("AtlasTexture_do37j")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ckuk1")
+"texture": SubResource("AtlasTexture_cda41")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_cucnv")
+"texture": SubResource("AtlasTexture_i6knb")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_8g61b")
+"texture": SubResource("AtlasTexture_fbbgx")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0hte2")
+"texture": SubResource("AtlasTexture_03qa1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fbbgx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i6knb")
 }],
 "loop": true,
 "name": &"default",
-"speed": 8.0
+"speed": 5.0
 }]
 
-[node name="Tree" type="AnimatedSprite2D"]
-sprite_frames = SubResource("SpriteFrames_x4m52")
-autoplay = "default"
+[node name="Tree" type="Node2D"]
+script = ExtResource("1_3lj6g")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -64)
+sprite_frames = SubResource("SpriteFrames_h6gix")

@@ -222,9 +222,6 @@ namespace Graphs.Shannon
 
             AssertSTExistance(a, b);
             
-            Logger.Debug("Tree A");
-
-            Logger.Debug("Tree B");
 
             return new(spanningTreeA.Edges.ToList(), spanningTreeB.Edges.ToList());
         }

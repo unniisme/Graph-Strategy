@@ -71,7 +71,7 @@ namespace Gamelogic.Grid
 
 			if (setLayerZ)
 			{
-				ZIndex = GridPosition.Y;
+				ZIndex = grid.ZIndex + GridPosition.Y;
 			}
 		}
 

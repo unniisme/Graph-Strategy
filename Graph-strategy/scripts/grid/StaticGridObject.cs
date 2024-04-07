@@ -17,6 +17,11 @@ namespace Gamelogic.Objects
 		[Export]
 		public bool snap = true;
 
+
+		[Export]
+		public bool setLayerZ = true;
+
+
 		public virtual Vector2I GridPosition
 		{
 			get => grid.GetObjectPosition(this);
@@ -29,15 +34,15 @@ namespace Gamelogic.Objects
 			grid ??= GameManager.GetLevel().grid;
 			// Register on the grid
 			grid.PlaceObject(this, grid.GameCoordinateToGridCoordinate(GlobalPosition));
-		}
 
-		// Called every frame. 'delta' is the elapsed time since the previous frame.
-		public override void _PhysicsProcess(double delta)
-		{
-			// Snap to grid
 			if (snap)
 			{
 				Position = grid.GridCoordinateToGameCoordinate(GridPosition);
+			}
+
+			if (setLayerZ)
+			{
+				ZIndex = grid.ZIndex + GridPosition.Y;
 			}
 		}
 

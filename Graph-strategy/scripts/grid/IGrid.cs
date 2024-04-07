@@ -26,6 +26,13 @@ namespace Gamelogic.Grid
         public Vector2 Offset {get; set;}
 
         /// <summary>
+        /// ZIndex for rendering
+        /// Godot nodes have by default
+        /// Objects at GridPosition.y = y has ZIndex = grid.ZIndex + y
+        /// </summary>
+        public int ZIndex {get;}
+
+        /// <summary>
         /// Given a position in game coordinates, returns the corresponding cell in the grid
         /// </summary>
         /// <param name="pos">Game coordinates</param>

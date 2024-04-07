@@ -15,5 +15,11 @@ namespace Gamelogic.Managers
                 BlueTeamName => RedTeamName,
                 _ => ""
             };
+
+        private static int uid = 0;    
+        public static int UIDgen
+        {
+            get {uid += 1; return uid;}
+        }
     }
 }

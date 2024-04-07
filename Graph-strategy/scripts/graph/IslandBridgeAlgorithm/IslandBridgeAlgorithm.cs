@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Graphs
 {
-    public class IslandBridgeAlgorithm<T>
+    public static class IslandBridgeAlgorithm<T>
     {
         /// <summary>
         /// Algorithm separates the graph into Bridges which are connected
@@ -51,7 +51,7 @@ namespace Graphs
         {
             foreach (Node<Islet<T>> islet in overGraph.Nodes)
             {
-                if (islet.Data.Nodes.Contains(node))
+                if (islet.Data.Contains(node.Data))
                     return islet.Data;
             }
             return null;
@@ -59,7 +59,7 @@ namespace Graphs
 
         private static void ExpandNode(Graph<Islet<T>> overGraph, Node<T> currNode, Islet<T> currIslet)
         {
-            if (currIslet.Nodes.Contains(currNode)) return;
+            if (currIslet.Contains(currNode.Data)) return;
 
             // If node is already visited, it is in a different Island. Add an edge between these 2 islets
             // If the edge falls between 2 islands, they will be merged on postprocessing
@@ -90,7 +90,7 @@ namespace Graphs
                 currIslet = island;
             }
 
-            currIslet.AddNode(currNode);
+            currIslet.Add(currNode.Data);
             foreach (Node<T> neighbor in currNode.Neighbors)
             {
                 ExpandNode(overGraph, neighbor, currIslet);
@@ -137,20 +137,20 @@ namespace Graphs
                             continue;
 
                         finalGraph.RemoveNode(nodeMap[edge.ToNode]);
-                        nodeMap[edge.FromNode].Data.JoinNodes(edge.ToNode.Data);
+                        nodeMap[edge.FromNode].Data.UnionWith(edge.ToNode.Data);
                         nodeMap[edge.ToNode] = nodeMap[edge.FromNode];
                     }
 
                     // If either of the islands are present, merge the other one into this one
                     else if (fromPresent && !toPresent)
                     {
-                        nodeMap[edge.FromNode].Data.JoinNodes(edge.ToNode.Data);
+                        nodeMap[edge.FromNode].Data.UnionWith(edge.ToNode.Data);
                         nodeMap[edge.ToNode] = nodeMap[edge.FromNode];
                     }
 
                     else if (!fromPresent && toPresent)
                     {
-                        nodeMap[edge.ToNode].Data.JoinNodes(edge.FromNode.Data);
+                        nodeMap[edge.ToNode].Data.UnionWith(edge.FromNode.Data);
                         nodeMap[edge.FromNode] = nodeMap[edge.ToNode];
                     }
 
@@ -158,7 +158,7 @@ namespace Graphs
                     else
                     {
                         Islet<T> newIslet = edge.FromNode.Data;
-                        newIslet.JoinNodes(edge.ToNode.Data);
+                        newIslet.UnionWith(edge.ToNode.Data);
 
                         Node<Islet<T>> newNode = finalGraph.AddNode(newIslet);
                         nodeMap[edge.FromNode] = newNode;
@@ -200,7 +200,7 @@ namespace Graphs
                     // If it's connected to the same island, simple merge with the island
                     if (fromNode == toNode)
                     {
-                        toNode.Data.JoinNodes(edge.FromNode.Data);
+                        toNode.Data.UnionWith(edge.FromNode.Data);
                     }
                     else
                     {

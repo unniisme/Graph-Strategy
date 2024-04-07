@@ -75,7 +75,7 @@ namespace Logging
             {
                 //Fetch namespace of caller
                 MethodBase method = new StackFrame(2).GetMethod();
-                string namespaceName = method?.DeclaringType?.Namespace ?? "Unknown" ?? "Unknown";
+                string namespaceName = method?.ReflectedType?.Name ?? "Unknown" ?? "Unknown";
 
                 string logMessage = $"[{LogLevelName( level )}]".PadRight(10) +
                     $"[{DateTime.Now}]" +

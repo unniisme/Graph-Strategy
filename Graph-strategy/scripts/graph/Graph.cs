@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gamelogic.Managers;
 using Graphs.Utils;
 namespace Graphs
 {
@@ -23,13 +24,7 @@ namespace Graphs
     /// <typeparam name="T"></typeparam>
     public class Graph<T>
     {
-        private static int uid = 0;
-        private static int UIDgen
-        {
-            get {uid += 1; return uid;}
-        }
-
-        public int UID {get;} = UIDgen;
+        public int UID {get;} = GameResources.UIDgen;
 
         public HashSet<Node<T>> Nodes { get; } = new HashSet<Node<T>>();
         public HashSet<Edge<T>> Edges { get; } = new HashSet<Edge<T>>();

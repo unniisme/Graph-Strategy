@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Gamelogic.Grid;
+using Gamelogic.Grid.Graph;
 using Godot;
 using Graphs;
 using Graphs.Shannon;
@@ -58,9 +58,9 @@ namespace Gamelogic.Managers
         private static List<Vector2I> IsletToGridPositions(Islet<Vector2I> islet)
         {
             List<Vector2I> nodes = new();
-            foreach (Node<Vector2I> node in islet.Nodes)
+            foreach (Vector2I node in islet)
             {
-                nodes.Add(node.Data);
+                nodes.Add(node);
             }
             return nodes;
         }
@@ -146,11 +146,20 @@ namespace Gamelogic.Managers
         {
             foreach (Islet<Vector2I> islet in islandGraph.DataNodeMap.Keys)
             {
-                DrawGraph(islet, 5, Colors.Green);
+                DrawIslet(islet, 5, Colors.Green);
+                
             }
             foreach (Edge<Islet<Vector2I>> edge in islandGraph.Edges)
             {
-                DrawGraph(edge.Data, 3, Colors.Red);
+                DrawIslet(edge.Data, 3, Colors.Red);
+            }
+        }
+
+        private void DrawIslet(Islet<Vector2I> islet, float radius, Color col)
+        {
+            foreach (Vector2I pos in islet)
+            {
+                DrawCircle(grid.GridCoordinateToGameCoordinate(pos), radius, col);
             }
         }
 
@@ -158,7 +167,7 @@ namespace Gamelogic.Managers
         {
             foreach (Edge<Islet<Vector2I>> edge in edges)
             {
-                DrawGraph(edge.Data, radius, color);
+                DrawIslet(edge.Data, radius, color);
             }
         }
 
@@ -217,9 +226,9 @@ namespace Gamelogic.Managers
         private string ShowIslet(Islet<Vector2I> islet)
         {
             string isletString = islet.IsIsland?"Island :":"Bridge :";
-            foreach (Node<Vector2I> pos in islet.Nodes)
+            foreach (Vector2I pos in islet)
             {
-                isletString = $"{isletString} {pos.Data}";
+                isletString = $"{isletString} {pos}";
             }
             return isletString;
         }
