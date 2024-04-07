@@ -1,18 +1,23 @@
 using Godot;
 using Graphs;
 
-namespace Gamelogic.Grid
+namespace Gamelogic.Grid.Graph
 {
     public class NavigationGridGraph : Graph<Vector2I>
     {
-        private readonly Vector2I[] dirs = {
+        public readonly Vector2I[] dirs = {
             Vector2I.Up,
             Vector2I.Left,
             Vector2I.Down,
             Vector2I.Right
         };
 
-        private readonly IGrid grid;
+        internal readonly IGrid grid;
+
+        public NavigationGridGraph(IGrid grid)
+        {
+            this.grid = grid;
+        }
         public NavigationGridGraph(IGrid grid, Vector2I startPos)
         {
             this.grid = grid;
@@ -20,8 +25,11 @@ namespace Gamelogic.Grid
             MakeNode(startPos);
         }
 
-        private Node<Vector2I> MakeNode(Vector2I pos)
+        internal Node<Vector2I> MakeNode(Vector2I pos)
         {
+
+            if (DataNodeMap.ContainsKey(pos))
+                return DataNodeMap[pos];
 
             Node<Vector2I> fromNode = AddNode(pos);
 
@@ -29,7 +37,7 @@ namespace Gamelogic.Grid
             {
                 Vector2I newPos =  grid.GetPositionInDirection(pos, dir);
                 
-                if (grid.GetObject(newPos) != null) continue;
+                if (!CheckPos(newPos)) continue;
                 if (DataNodeMap.ContainsKey(newPos))
                 {
                     if (!fromNode.Neighbors.Contains(DataNodeMap[newPos]))
@@ -41,10 +49,16 @@ namespace Gamelogic.Grid
 
                 // The weird data equation is to preserve uniqueness of edges
                 // Each edge is a pseudo independant pair of vectors 
-                AddEdge(fromNode, toNode, pos+newPos + 100003 * (newPos - pos));
+                // As long as coordinates are less than 1000003
+                AddEdge(fromNode, toNode, pos+newPos + 1000003 * (newPos - pos));
             }
 
             return fromNode;
+        }
+
+        internal virtual bool CheckPos(Vector2I pos)
+        {
+            return grid.GetObject(pos) == null;
         }
     }
 }
