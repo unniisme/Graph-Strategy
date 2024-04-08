@@ -23,6 +23,7 @@ namespace Gamelogic
         public int distanceToOtherTowers = 2;
 
         public event Action TurnedOff;
+        public event Action<Vector2I> Placed;
 
         public Vector2I GridPosition => grid.GameCoordinateToGridCoordinate(Position);
 
@@ -64,6 +65,7 @@ namespace Gamelogic
                         towerNode.grid = grid;
                         GameManager.GetLevel().AddChild(towerNode);
                         Off();
+                        Placed?.Invoke(GridPosition);
                     }
                 }
             }

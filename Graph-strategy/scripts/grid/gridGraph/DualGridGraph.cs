@@ -5,7 +5,7 @@ namespace Gamelogic.Grid.Graph
 {
     public class DualGridGraph : NavigationGridGraph
     {
-        private Graph<Islet<Vector2I>> islandGraph = null;
+        private readonly IslandBridgeGraph<Vector2I> islandGraph = null;
         public DualGridGraph(IGrid grid) : base(grid) {}
         
         public void SearchAll()
@@ -16,7 +16,7 @@ namespace Gamelogic.Grid.Graph
             }
         }
 
-        public DualGridGraph(IGrid grid, Graph<Islet<Vector2I>> islandGraph) : this(grid)
+        public DualGridGraph(IGrid grid, IslandBridgeGraph<Vector2I> islandGraph) : this(grid)
         {
             this.islandGraph = islandGraph;
             SearchAll();
@@ -28,15 +28,11 @@ namespace Gamelogic.Grid.Graph
         {
             if (islandGraph != null)
             {
-                // Inefficient but fine since it's one time
-                foreach (Edge<Islet<Vector2I>> edge in islandGraph.Edges)
+                if (islandGraph.islets.ContainsElement(pos))
                 {
-                    if (edge.Data.Contains(pos))
-                    {
+                    if (!islandGraph.islets.IsIsland(pos))
                         return true;
-                    }
                 }
-
             }
 
             return grid.GetObject(pos) != null;

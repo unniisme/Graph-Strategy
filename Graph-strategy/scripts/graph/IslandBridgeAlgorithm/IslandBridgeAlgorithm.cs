@@ -22,6 +22,8 @@ namespace Graphs
             PostProcess(ConstructOverGraph(startNode));
         }
 
+        public IslandBridgeGraph() {}
+
         public Graph<T> ConstructOverGraph(Node<T> startNode)
         {
             Graph<T> overGraph = new();
@@ -29,7 +31,7 @@ namespace Graphs
 
             T currIslet = startNode.Data;
 
-            if (currNode.Degree > 2)
+            if (IslandCondition(currNode))
             {
                 islets.MakeSet(currIslet, true);
                 overGraph.AddNode(currIslet);
@@ -68,7 +70,7 @@ namespace Graphs
 
             // Add Deg 2 edges as bridge nodes
             // They will be converted to edges on postprocessing
-            if (islets.IsIsland(currIslet) && currNode.Degree <= 2)
+            if (islets.IsIsland(currIslet) && !IslandCondition(currNode))
             {
                 islets.MakeSet(currNode.Data, false);
                 T bridge = currNode.Data;
@@ -76,7 +78,7 @@ namespace Graphs
                 TryAddEdge(overGraph, bridge, currIslet, bridge);
                 currIslet = bridge;
             }
-            else if (!islets.IsIsland(currIslet) && currNode.Degree > 2)
+            else if (!islets.IsIsland(currIslet) && IslandCondition(currNode))
             {
                 islets.MakeSet(currNode.Data, true);
                 T island = currNode.Data;
@@ -108,7 +110,7 @@ namespace Graphs
             graph.AddEdge(from, to, data);
         }
 
-        private void PostProcess(Graph<T> graph)
+        internal virtual void PostProcess(Graph<T> graph)
         {
             HashSet<Edge<T>> visitedEdges = new();
             
@@ -158,6 +160,12 @@ namespace Graphs
                     }
                 }
             }
+        }
+
+
+        internal virtual bool IslandCondition(Node<T> node)
+        {
+            return node.Degree > 2;
         }
 
     }

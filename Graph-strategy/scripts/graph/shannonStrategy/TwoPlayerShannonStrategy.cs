@@ -219,32 +219,33 @@ namespace Graphs.Shannon
 
             while (ExtractIntersection()){}
 
-            AssertSTExistance(a, b);
+            SpanningTreesExist = AssertSTExistance(a, b);
+            Logger.Inform($"Spanning tree existance : {SpanningTreesExist}");
             
 
             return new(spanningTreeA.Edges.ToList(), spanningTreeB.Edges.ToList());
         }
 
-        private void AssertSTExistance(T a, T b)
+        private bool AssertSTExistance(T a, T b)
         {
-            SpanningTreesExist = true;
-            // Check if proper spanning trees have been found
-            if (a != null && b != null)
+            foreach (SpanningTree<T> sp in SpanningTrees)
             {
-                foreach (SpanningTree<T> sp in SpanningTrees)
+                if (!sp.VertexSet.ContainsElement(a) || !sp.VertexSet.ContainsElement(b))
                 {
-                    if (!sp.VertexSet.Find(a).Equals(sp.VertexSet.Find(b)))
-                    {
-                        SpanningTreesExist = false;
-                    }
+                    return false;
+                }
+                if (!sp.VertexSet.Find(a).Equals(sp.VertexSet.Find(b)))
+                {
+                    return false;
                 }
             }
+
             if (spanningTreeA.Edges.Count != spanningTreeB.Edges.Count)
             {
-                SpanningTreesExist = false;
+                return false;
             }
 
-            Logger.Inform($"Spanning tree existance : {SpanningTreesExist}");
+            return true;
         }
 
         private bool ExtractIntersection()
@@ -320,11 +321,11 @@ namespace Graphs.Shannon
 
         public T GetShortMove()
         {
-            if (!SpanningTreesExist)
-            {
-                // For now random move
-                return default;
-            }
+            // if (!SpanningTreesExist)
+            // {
+            //     // For now random move
+            //     return default;
+            // }
 
             foreach (T cutEdgeData in cutEdges)
             {
