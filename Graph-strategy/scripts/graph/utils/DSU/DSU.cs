@@ -5,14 +5,8 @@ namespace Graphs.Utils
 {
     public class DSU<T> : IDSU<T>
     {
-        internal readonly Dictionary<T, T> parent;
-        internal readonly Dictionary<T, int> rank;
-
-        public DSU()
-        {
-            parent = new Dictionary<T, T>();
-            rank = new Dictionary<T, int>();
-        }
+        internal readonly Dictionary<T, T> parent = new();
+        internal readonly Dictionary<T, int> rank = new();
 
         public bool ContainsElement(T element)
         {

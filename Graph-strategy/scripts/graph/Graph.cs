@@ -60,6 +60,11 @@ namespace Graphs
             DataNodeMap.Remove(node.Data);
         }
 
+        public void RemoveNode(T nodeData)
+        {
+            RemoveNode(DataNodeMap[nodeData]);
+        }
+
         public virtual void AddEdge(Node<T> fromNode, Node<T> toNode, T data)
         {
             Edge<T> newEdge = new()

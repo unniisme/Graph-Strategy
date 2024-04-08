@@ -217,8 +217,7 @@ namespace Graphs.Shannon
                 TryGrowSpanningTrees(edge);
             }
 
-            ExtractIntersection();
-            ExtractIntersection();
+            while (ExtractIntersection()){}
 
             AssertSTExistance(a, b);
             
@@ -248,8 +247,10 @@ namespace Graphs.Shannon
             Logger.Inform($"Spanning tree existance : {SpanningTreesExist}");
         }
 
-        private void ExtractIntersection()
+        private bool ExtractIntersection()
         {
+            bool isUpdated = false; 
+
             // Extracting intersection graph
             HashSet<T> nodesA = new();
             HashSet<T> nodesB = new();
@@ -269,12 +270,18 @@ namespace Graphs.Shannon
             {   
                 if (!intersectionNodes.Contains(node.Data))
                 {
+                    if (!spanningTreeA.DataNodeMap.ContainsKey(node.Data) && !spanningTreeB.DataNodeMap.ContainsKey(node.Data))
+                        continue;
+
                     spanningTreeA.RemoveNode(node);
                     spanningTreeB.RemoveNode(node);
 
                     Logger.Inform($"Removing node {DataToString(node.Data)} from STs");
+                    isUpdated = true;
                 }
             }
+
+            return isUpdated;
         }
 
         public void Short(T edgeData)
