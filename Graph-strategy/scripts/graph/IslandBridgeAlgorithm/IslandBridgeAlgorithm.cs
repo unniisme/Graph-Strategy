@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Graphs.Utils;
+using Logging;
 
 namespace Graphs
 {
@@ -19,6 +20,12 @@ namespace Graphs
         /// <returns></returns>
         public IslandBridgeGraph(Node<T> startNode)
         {
+            PostProcess(ConstructOverGraph(startNode));
+        }
+
+        public IslandBridgeGraph(Node<T> startNode, Logger logger)
+        {
+            Trace = logger;
             PostProcess(ConstructOverGraph(startNode));
         }
 
@@ -166,6 +173,44 @@ namespace Graphs
         internal virtual bool IslandCondition(Node<T> node)
         {
             return node.Degree > 2;
+        }
+
+        public override Node<T> ShortEdge(Edge<T> edge)
+        {
+            Dictionary<T,T> fromEdges = new();
+            Dictionary<T,T> toEdges = new();
+
+            foreach (Edge<T> e in Edges)
+            {
+                if (e.FromNode.Data.Equals(edge.FromNode.Data) || e.FromNode.Data.Equals(edge.ToNode.Data))
+                {
+                    if (e.ToNode != edge.FromNode && e.ToNode != edge.ToNode)
+                        toEdges[e.Data] = e.ToNode.Data;
+                }
+                if (e.ToNode.Data.Equals(edge.FromNode.Data) || e.ToNode.Data.Equals(edge.ToNode.Data))
+                {
+                    if (e.FromNode != edge.FromNode && e.FromNode != edge.ToNode)
+                        fromEdges[e.Data] = e.FromNode.Data;
+                }
+            }
+
+            RemoveNode(edge.FromNode);
+            RemoveNode(edge.ToNode);
+
+            islets.Union(edge.FromNode.Data, edge.ToNode.Data);
+
+            Node<T> newNode = AddNode(islets.Find(edge.FromNode.Data));
+            
+            foreach (KeyValuePair<T,T> edgeNeighbor in fromEdges)
+            {
+                AddEdge(edgeNeighbor.Value, newNode.Data, edgeNeighbor.Key);
+            }
+            foreach (KeyValuePair<T,T> edgeNeighbor in toEdges)
+            {
+                AddEdge(newNode.Data, edgeNeighbor.Value, edgeNeighbor.Key);
+            }
+
+            return newNode;
         }
 
     }

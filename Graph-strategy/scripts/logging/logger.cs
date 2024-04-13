@@ -13,11 +13,62 @@ namespace Logging
         CRITICAL
     }
 
+    public class Logger
+    {
+        public LogLevel LogLevel { get; set; } = LogLevel.INFO;
+        public string Header {get;private set;}= "[]";
+
+        public Logger(string name, LogLevel logLevel = LogLevel.INFO)
+        {
+            Header = $"[{name}]";
+            LogLevel = logLevel;
+        }
+
+        public Logger(Logger overLogger, string name)
+        {
+            Header = $"{overLogger.Header}[{name}]";
+            LogLevel = overLogger.LogLevel;
+        }
+
+        public void Log(string message, LogLevel level)
+        {
+            StaticLogger.Log(message, Header, level);
+        }
+
+
+        /// <summary>
+        /// Write a log of level DEBUG.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Debug(string message) => Log(message, LogLevel.DEBUG);
+        /// <summary>
+        /// Write a log of level INFO.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Inform(string message) => Log(message, LogLevel.INFO );
+        /// <summary>
+        /// Write a log of level WARNING.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Warn(string message) => Log(message , LogLevel.WARNING );
+        /// <summary>
+        /// Write a log of level ERROR.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Error(string message) => Log(message , LogLevel.ERROR );
+        /// <summary>
+        /// Write a log of level CRITICAL.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Critical( string message ) => Log( message , LogLevel.CRITICAL );
+
+    }
+
     /// <summary>
     /// Simple logger that can log 5 levels, and logs namespace
     /// Writing to file is done by a <see cref="LogWriter"/> thread
     /// </summary>
-    public static class Logger
+    public static class StaticLogger
     {
         private static LogLevel s_logLevel = LogLevel.DEBUG;
 
@@ -25,7 +76,7 @@ namespace Logging
         /// Start a new logger instance with given team name
         /// </summary>
         /// <param name="teamName">Name of team to be logged</param>
-        static Logger()
+        static StaticLogger()
         {
             LogWriter.StartThread(); // Initialize thread for writing log
 
@@ -80,6 +131,27 @@ namespace Logging
                 string logMessage = $"[{LogLevelName( level )}]".PadRight(10) +
                     $"[{DateTime.Now}]" +
                     $"[{namespaceName}]" +
+                    $" {message}";
+                LogWriter.WriteLog(logMessage);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError( $"Logging message {message} failed with error {e}" );
+            }
+        }
+
+        public static void Log(string message, string header, LogLevel level)
+        {
+            if (level < s_logLevel)
+            {
+                return; // Mask log levels
+            }
+
+            try
+            {
+                string logMessage = $"[{LogLevelName( level )}]".PadRight(10) +
+                    $"[{DateTime.Now}]" +
+                    header +
                     $" {message}";
                 LogWriter.WriteLog(logMessage);
             }

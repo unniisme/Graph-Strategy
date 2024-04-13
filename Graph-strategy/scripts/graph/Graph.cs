@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Gamelogic.Managers;
 using Graphs.Utils;
+using Logging;
 namespace Graphs
 {
     public class Node<T>
@@ -24,6 +25,8 @@ namespace Graphs
     /// <typeparam name="T"></typeparam>
     public class Graph<T>
     {
+        public Logger Trace {get; set;} = new Logger("Graph");
+
         public int UID {get;} = GameResources.UIDgen;
 
         public HashSet<Node<T>> Nodes { get; } = new HashSet<Node<T>>();
@@ -51,10 +54,11 @@ namespace Graphs
 
         public virtual void RemoveNode(Node<T> node)
         {
-            List<Edge<T>> adjList = new (node.AdjList);
-            foreach (Edge<T> edge in adjList)
+            List<Edge<T>> edges = new (Edges);
+            foreach (Edge<T> edge in Edges)
             {
-                RemoveEdge(edge);
+                if (edge.FromNode == node || edge.ToNode == node) 
+                    RemoveEdge(edge);
             }
             Nodes.Remove(node);
             DataNodeMap.Remove(node.Data);
@@ -86,11 +90,13 @@ namespace Graphs
 
         public virtual void AddEdge(T fromData, T toData, T edgeData)
         {
+            Trace.Inform($"Adding edge {fromData} -> {toData} : {edgeData}");
             AddEdge(DataNodeMap[fromData], DataNodeMap[toData], edgeData);
         }
 
         public virtual void RemoveEdge(Edge<T> edge)
         {
+            Trace.Inform($"Removing edge {edge.FromNode.Data} -> {edge.ToNode.Data} : {edge.Data}");
             edge.FromNode.AdjList.Remove(edge);
             Edges.Remove(edge);
             DataEdgeMap.Remove(edge.Data);
@@ -107,6 +113,46 @@ namespace Graphs
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Remove an edge and merge the end nodes of the edge
+        /// Makes a new node with the same data as the fromNode of target edge
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <returns>The merged node</returns>
+        public virtual Node<T> ShortEdge(Edge<T> edge)
+        {
+            Dictionary<T,T> fromEdges = new();
+            Dictionary<T,T> toEdges = new();
+
+            foreach (Edge<T> e in Edges)
+            {
+                if (e.FromNode.Data.Equals(edge.FromNode.Data) || e.FromNode.Data.Equals(edge.ToNode.Data))
+                {
+                    toEdges[e.Data] = e.ToNode.Data;
+                }
+                if (e.ToNode.Data.Equals(edge.FromNode.Data) || e.ToNode.Data.Equals(edge.ToNode.Data))
+                {
+                    fromEdges[e.Data] = e.FromNode.Data;
+                }
+            }
+
+            RemoveNode(edge.FromNode);
+            RemoveNode(edge.ToNode);
+
+            Node<T> newNode = AddNode(edge.FromNode.Data);
+            
+            foreach (KeyValuePair<T,T> edgeNeighbor in fromEdges)
+            {
+                AddEdge(edgeNeighbor.Value, newNode.Data, edgeNeighbor.Key);
+            }
+            foreach (KeyValuePair<T,T> edgeNeighbor in toEdges)
+            {
+                AddEdge(newNode.Data, edgeNeighbor.Value, edgeNeighbor.Key);
+            }
+
+            return newNode;
         }
     }
 }

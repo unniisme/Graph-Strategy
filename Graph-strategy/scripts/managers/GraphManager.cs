@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gamelogic.Grid;
@@ -13,13 +12,13 @@ namespace Gamelogic.Managers
     [GlobalClass]
     public partial class GraphManager : Node2D
     {
+        Logger logger = new("GraphManager"); 
+
         private NavigationGridGraph gridGraph = null;
         private DualGridGraph gridGraphDual = null;
         private IGrid grid = null;
         private IslandBridgeGraph<Vector2I> islandGraph = null;
         private DualIslandBridgeGraph islandGraphDual = null;
-        private Tuple<List<Edge<Vector2I>>, List<Edge<Vector2I>>> spanningTrees = null;
-        private Tuple<List<Edge<Vector2I>>, List<Edge<Vector2I>>> spanningTreesDual = null;
         private IShannonStrategy<Vector2I> shannonStrategyShort;
         private IShannonStrategy<Vector2I> shannonStrategyCut;
 
@@ -75,22 +74,31 @@ namespace Gamelogic.Managers
             grid ??= GameManager.GetLevel().grid;
             Vector2I pos = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
 
-            gridGraph = new(grid, pos);
-            islandGraph = new IslandBridgeGraph<Vector2I>(gridGraph.DataNodeMap[pos]);
+            gridGraph = new(grid, pos)
+            {
+                Trace = new("gridGraph")
+            };
+            islandGraph = new IslandBridgeGraph<Vector2I>(gridGraph.DataNodeMap[pos], new("islandGraph"));
 
-            gridGraphDual = new(grid, islandGraph);
+            gridGraphDual = new(grid, islandGraph)
+            {
+                Trace = new("gridGraphDual")
+            };
             Vector2I dualPos = gridGraphDual.DataNodeMap.Keys.First();
-            islandGraphDual = new DualIslandBridgeGraph(gridGraphDual.DataNodeMap[dualPos], islandGraph);
+            islandGraphDual = new DualIslandBridgeGraph(gridGraphDual.DataNodeMap[dualPos], islandGraph, new("islandGraphDual"));
 
 
-            shannonStrategyShort = new TwoPlayerShannonStrategy<Vector2I>(islandGraph);
-            shannonStrategyCut = new TwoPlayerShannonStrategy<Vector2I>(islandGraphDual);
+            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph)
+            {
+                Trace = new("shannonStrategyShort")
+            };
+            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual)
+            {
+                Trace = new("shannonStrategyCut")
+            };
 
-            Vector2I shortGridSpot = grid.GameCoordinateToGridCoordinate(shortSpot.Position);
-            Vector2I cutGridSpot = grid.GameCoordinateToGridCoordinate(cutSpot.Position);
-
-            spanningTrees = shannonStrategyShort.GetSpanningTrees(islandGraph.islets.Find(shortGridSpot), islandGraph.islets.Find(cutGridSpot));
-            spanningTreesDual = shannonStrategyCut.GetSpanningTrees(dualPos, dualPos);
+            shannonStrategyShort.FindSpanningTrees();
+            shannonStrategyCut.FindSpanningTrees();
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
@@ -105,6 +113,8 @@ namespace Gamelogic.Managers
 
             Vector2I cutMove = shannonStrategyCut.GetShortMove();
             GD.Print($"Cut Move : {cutMove}");
+
+            QueueRedraw();
         }
 
         private void MakeCutMove(Vector2I pos)
@@ -116,6 +126,8 @@ namespace Gamelogic.Managers
 
             Vector2I shortMove = shannonStrategyShort.GetShortMove();
             GD.Print($"Short Move : {shortMove}");
+
+            QueueRedraw();
         }
 
         private void DrawEdges(List<Edge<Vector2I>> edges, float radius, Color color)
@@ -174,11 +186,11 @@ namespace Gamelogic.Managers
                         DrawMultiGraph(islandGraphDual, 7, Colors.Red);
                     }
 
-                    if (debugDrawSpanningTrees)
-                    {
-                        DrawEdges(spanningTreesDual.Item1, 10,  Colors.GreenYellow);
-                        DrawEdges(spanningTreesDual.Item2, 10,  Colors.BlanchedAlmond);
-                    }
+                    // if (debugDrawSpanningTrees)
+                    // {
+                    //     DrawEdges(spanningTreesDual.Item1, 10,  Colors.GreenYellow);
+                    //     DrawEdges(spanningTreesDual.Item2, 10,  Colors.BlanchedAlmond);
+                    // }
                 }
                 else
                 {
@@ -188,11 +200,11 @@ namespace Gamelogic.Managers
                         DrawMultiGraph(islandGraph, 7, Colors.Red);
                     }
 
-                    if (debugDrawSpanningTrees)
-                    {
-                        DrawEdges(spanningTrees.Item1, 10,  Colors.GreenYellow);
-                        DrawEdges(spanningTrees.Item2, 10,  Colors.BlanchedAlmond);
-                    }
+                    // if (debugDrawSpanningTrees)
+                    // {
+                    //     DrawEdges(spanningTrees.Item1, 10,  Colors.GreenYellow);
+                    //     DrawEdges(spanningTrees.Item2, 10,  Colors.BlanchedAlmond);
+                    // }
                 }
             }
 

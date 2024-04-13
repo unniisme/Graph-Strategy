@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using Graphs;
+using Logging;
 
 namespace Gamelogic.Grid.Graph
 {
@@ -9,6 +10,13 @@ namespace Gamelogic.Grid.Graph
         private readonly IslandBridgeGraph<Vector2I> primal = null;
         public DualIslandBridgeGraph(Node<Vector2I> start, IslandBridgeGraph<Vector2I> primal) 
         {
+            this.primal = primal;
+            PostProcess(ConstructOverGraph(start));
+        }
+
+        public DualIslandBridgeGraph(Node<Vector2I> start, IslandBridgeGraph<Vector2I> primal, Logger logger) 
+        {
+            Trace = logger;
             this.primal = primal;
             PostProcess(ConstructOverGraph(start));
         }

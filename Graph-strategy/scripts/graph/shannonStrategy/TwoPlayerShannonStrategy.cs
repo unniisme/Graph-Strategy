@@ -9,28 +9,45 @@ namespace Graphs.Shannon
 {
     public class TwoPlayerShannonStrategy<T> : IShannonStrategy<T>
     {
-        private readonly Graph<T> graph;
-        private readonly SpanningTree<T> spanningTreeA = new();
-        private readonly SpanningTree<T> spanningTreeB = new();
-        private readonly Dictionary<T,int> edgeToSpanningTree = new();
-        private readonly HashSet<T> shortedEdges = new();
-        private readonly HashSet<T> cutEdges = new();
+        public Logger Trace { get; set; } = new Logger("TwoPlayerShannonStrategy");
+
+        internal readonly Graph<T> graph;
+        internal SpanningTree<T> spanningTreeA = new();
+        internal SpanningTree<T> spanningTreeB = new();
+        internal readonly Dictionary<T,int> edgeToSpanningTree = new();
+        internal readonly HashSet<T> shortedEdges = new();
+        internal readonly HashSet<T> cutEdges = new();
         public Func<T,string> DataToString {get; set;} = (t) => $"{t}";
         
-        public bool SpanningTreesExist {get; private set;} = false;
-
-        private List<SpanningTree<T>> SpanningTrees => new() {
+        public List<SpanningTree<T>> SpanningTrees => new() {
             spanningTreeA,
             spanningTreeB
         };
 
-        private static int OtherIndex(int i) => (i+1)%2;
+        internal static int OtherIndex(int i) => (i+1)%2;
 
         public TwoPlayerShannonStrategy(Graph<T> graph)
         {
             this.graph = graph;
 
-            Logger.Inform("Initializing");
+            Clear();
+
+            Trace.Inform("Initializing");
+        }
+
+        internal void Clear()
+        {
+            spanningTreeA = new()
+            {
+                Trace = new(Trace, "spanning tree A")
+            };
+            spanningTreeB = new()
+            {
+                Trace = new(Trace, "spanning tree B")
+            };
+            edgeToSpanningTree.Clear();
+            shortedEdges.Clear();
+            cutEdges.Clear(); 
         }
 
         private bool TryGrowSpanningTrees(Edge<T> edge)
@@ -44,7 +61,7 @@ namespace Graphs.Shannon
                     // If not, add edge to this spannign tree
                     sp.AddEdge(edge.FromNode.Data, edge.ToNode.Data, edge.Data);
                     edgeToSpanningTree[edge.Data] = SpanningTrees.IndexOf(sp);
-                    Logger.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {SpanningTrees.IndexOf(sp)}");
+                    Trace.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {SpanningTrees.IndexOf(sp)}");
                     return true;
                 }
             }
@@ -80,14 +97,14 @@ namespace Graphs.Shannon
                 SpanningTree<T> otherSP = SpanningTrees[OtherIndex(edgeToSpanningTree[edgeData])];
 
                 currSP.RemoveEdge(currSP.DataEdgeMap[edgeData]);
-                Logger.Inform($"Removing Edge {DataToString(edgeData)} from Spanning Tree {edgeToSpanningTree[edgeData]}");
+                Trace.Inform($"Removing Edge {DataToString(edgeData)} from Spanning Tree {edgeToSpanningTree[edgeData]}");
                 otherSP.AddEdge(graph.DataEdgeMap[edgeData].FromNode.Data, graph.DataEdgeMap[edgeData].ToNode.Data, edgeData);
                 edgeToSpanningTree[edgeData] = OtherIndex(edgeToSpanningTree[edgeData]);
-                Logger.Inform($"Adding Edge {DataToString(edgeData)} to Spanning Tree {OtherIndex(edgeToSpanningTree[edgeData])}");
+                Trace.Inform($"Adding Edge {DataToString(edgeData)} to Spanning Tree {OtherIndex(edgeToSpanningTree[edgeData])}");
             }
             SpanningTrees[startIndex].AddEdge(edge.FromNode.Data, edge.ToNode.Data, edge.Data);
             edgeToSpanningTree[edge.Data] = startIndex;
-            Logger.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {startIndex}");
+            Trace.Inform($"Adding Edge {DataToString(edge.Data)} to Spanning Tree {startIndex}");
 
             return true;
 
@@ -137,8 +154,6 @@ namespace Graphs.Shannon
                                 OtherIndex(strategy.edgeToSpanningTree[curr]):
                                 startWith;
 
-                    Logger.Debug($"Expanding {strategy.DataToString(curr)} in tree {currTree}");
-
                     // Find a cycle in the other tree, add all of its edges as neighbors of this edge
                     //   in the auxillary graph
                     DFS<t> findCycle = new(strategy.SpanningTrees[currTree])
@@ -148,7 +163,6 @@ namespace Graphs.Shannon
                     };
                     findCycle.Update();
                     List<Edge<t>> pathEdges = findCycle.GetPathEdges();
-                    Logger.Debug($"Result :\n {string.Join("\n", pathEdges.ConvertAll((e) => strategy.DataToString(e.Data)))}");
 
                             // Edge is not an edge of the auxillary graph
                             // But an edge in the main graph
@@ -178,7 +192,7 @@ namespace Graphs.Shannon
                             // Search stops if adding this edge to the other tree will not
                             //  cause a cycle to form in the other tree
 
-                            Logger.Debug($"Checking target for {DataToString(edgeData)}");
+                            Trace.Debug($"Checking target for {DataToString(edgeData)}");
 
                             int currTree = edgeToSpanningTree.ContainsKey(edgeData)?
                                         OtherIndex(edgeToSpanningTree[edgeData]):
@@ -188,7 +202,7 @@ namespace Graphs.Shannon
                             Edge<T> edge = graph.DataEdgeMap[edgeData];
                             bool res = !vs.Find(edge.FromNode.Data).Equals(vs.Find(edge.ToNode.Data));
 
-                            Logger.Debug($"Result : {res}");
+                            Trace.Debug($"Result : {res}");
                             return res;
                         }
             };
@@ -196,12 +210,12 @@ namespace Graphs.Shannon
 
             return auxillarySearch;
         }
-        public Tuple<List<Edge<T>>, List<Edge<T>>> GetSpanningTrees(T a, T b)
+        public void FindSpanningTrees()
         {
             // Initialize spanning trees
             foreach (Node<T> node in graph.Nodes)
             {
-                Logger.Inform($"Node : {DataToString(node.Data)}");
+                Trace.Inform($"Node : {DataToString(node.Data)}");
 
                 foreach (SpanningTree<T> sp in SpanningTrees)
                 {
@@ -212,21 +226,17 @@ namespace Graphs.Shannon
             // Growing spanning trees for each edge in graph
             foreach (Edge<T> edge in graph.DataEdgeMap.Values)
             {
-                Logger.Debug($"Adding Edge : {DataToString(edge.Data)}");
+                Trace.Debug($"Adding Edge : {DataToString(edge.Data)}");
 
                 TryGrowSpanningTrees(edge);
             }
 
             while (ExtractIntersection()){}
 
-            SpanningTreesExist = AssertSTExistance(a, b);
-            Logger.Inform($"Spanning tree existance : {SpanningTreesExist}");
-            
-
-            return new(spanningTreeA.Edges.ToList(), spanningTreeB.Edges.ToList());
+            return;
         }
 
-        private bool AssertSTExistance(T a, T b)
+        public bool SpanningTreesExist(T a, T b)
         {
             foreach (SpanningTree<T> sp in SpanningTrees)
             {
@@ -277,7 +287,7 @@ namespace Graphs.Shannon
                     spanningTreeA.RemoveNode(node);
                     spanningTreeB.RemoveNode(node);
 
-                    Logger.Inform($"Removing node {DataToString(node.Data)} from STs");
+                    Trace.Inform($"Removing node {DataToString(node.Data)} from STs");
                     isUpdated = true;
                 }
             }
@@ -285,7 +295,7 @@ namespace Graphs.Shannon
             return isUpdated;
         }
 
-        public void Short(T edgeData)
+        public virtual void Short(T edgeData)
         {
             if (shortedEdges.Contains(edgeData))
             {
@@ -298,11 +308,11 @@ namespace Graphs.Shannon
             }
             else
             {
-                Logger.Warn("Edge not present in either spanningTree");
+                Trace.Warn("Edge not present in either spanningTree");
             }
         }
 
-        public void Cut(T edgeData)
+        public virtual void Cut(T edgeData)
         {
             if (cutEdges.Contains(edgeData))
             {
@@ -315,11 +325,11 @@ namespace Graphs.Shannon
             }
             else
             {
-                Logger.Warn("Edge not present in either spanningTree");
+                Trace.Warn("Edge not present in either spanningTree");
             }
         }
 
-        public T GetShortMove()
+        public virtual T GetShortMove()
         {
             // if (!SpanningTreesExist)
             // {
