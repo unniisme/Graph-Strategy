@@ -61,16 +61,22 @@ Offset = Vector2(32, 32)
 
 [node name="Goblins" type="Node2D" parent="."]
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot")]
+[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot", "outerSpot", "innerSpot")]
 z_index = 30
 script = ExtResource("5_ljex1")
 debugDraw = true
 shortSpot = NodePath("ShortSpot")
 cutSpot = NodePath("CutSpot")
+outerSpot = NodePath("OuterSpot")
+innerSpot = NodePath("InnerSpot")
 
 [node name="ShortSpot" type="Node2D" parent="GraphManager"]
 
 [node name="CutSpot" type="Node2D" parent="GraphManager"]
+
+[node name="OuterSpot" type="Node2D" parent="GraphManager"]
+
+[node name="InnerSpot" type="Node2D" parent="GraphManager"]
 
 [node name="Phantoms" type="Node2D" parent="."]
 

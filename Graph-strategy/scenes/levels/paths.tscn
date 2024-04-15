@@ -20,3 +20,9 @@ position = Vector2(848, -104)
 
 [node name="CutSpot" parent="GraphManager" index="1"]
 position = Vector2(-880, 40)
+
+[node name="OuterSpot" parent="GraphManager" index="2"]
+position = Vector2(-1128, 40)
+
+[node name="InnerSpot" parent="GraphManager" index="3"]
+position = Vector2(-352, 40)

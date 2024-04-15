@@ -20,20 +20,19 @@ namespace Graphs
         /// <returns></returns>
         public IslandBridgeGraph(Node<T> startNode)
         {
-            PostProcess(ConstructOverGraph(startNode));
+            PostProcess(ConstructOverGraph(startNode, new()));
         }
 
         public IslandBridgeGraph(Node<T> startNode, Logger logger)
         {
             Trace = logger;
-            PostProcess(ConstructOverGraph(startNode));
+            PostProcess(ConstructOverGraph(startNode, new()));
         }
 
         public IslandBridgeGraph() {}
 
-        public Graph<T> ConstructOverGraph(Node<T> startNode)
+        public virtual Graph<T> ConstructOverGraph(Node<T> startNode, Graph<T> overGraph)
         {
-            Graph<T> overGraph = new();
             Node<T> currNode = startNode;
 
             T currIslet = startNode.Data;
@@ -159,6 +158,7 @@ namespace Graphs
                             continue;
                         }
 
+                        Trace.Inform($"Adding edge {islets.Find(node.AdjList[0].ToNode.Data)} -> {islets.Find(node.AdjList[1].ToNode.Data)} : {islets.Find(islet)}");
                         AddEdge(
                             islets.Find(node.AdjList[0].ToNode.Data), 
                             islets.Find(node.AdjList[1].ToNode.Data),

@@ -38,6 +38,11 @@ namespace Gamelogic.Managers
 
         public Node2D cutSpot;
 
+        [Export]
+        public Node2D outerSpot;
+        [Export]
+        public Node2D innerSpot;
+
         BuildPhantom cutPhantom; // blue
         BuildPhantom shortPhantom; // red
 
@@ -84,15 +89,19 @@ namespace Gamelogic.Managers
             {
                 Trace = new("gridGraphDual")
             };
-            Vector2I dualPos = gridGraphDual.DataNodeMap.Keys.First();
-            islandGraphDual = new DualIslandBridgeGraph(gridGraphDual.DataNodeMap[dualPos], islandGraph, new("islandGraphDual"));
+
+            Vector2I outer = grid.GameCoordinateToGridCoordinate(outerSpot.Position);
+            Vector2I inner = grid.GameCoordinateToGridCoordinate(innerSpot.Position);
+            islandGraphDual = new DualIslandBridgeGraph(gridGraphDual.DataNodeMap[outer], gridGraphDual.DataNodeMap[inner],
+                                                            islandGraph, new("islandGraphDual")
+                                                        );
 
 
-            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph)
+            shannonStrategyShort = new TwoPlayerShannonStrategy<Vector2I>(islandGraph)
             {
                 Trace = new("shannonStrategyShort")
             };
-            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual)
+            shannonStrategyCut = new TwoPlayerShannonStrategy<Vector2I>(islandGraphDual)
             {
                 Trace = new("shannonStrategyCut")
             };
