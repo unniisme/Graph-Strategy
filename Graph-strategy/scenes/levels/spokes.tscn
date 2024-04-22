@@ -64,17 +64,25 @@ Offset = Vector2(32, 32)
 
 [node name="Goblins" type="Node2D" parent="."]
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot")]
+[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot", "outerSpot", "innerSpot")]
 script = ExtResource("5_1bbcx")
 debugDraw = true
 shortSpot = NodePath("ExpandTarget")
 cutSpot = NodePath("ExpandTarget2")
+outerSpot = NodePath("ExpandTarget3")
+innerSpot = NodePath("ExpandTarget4")
 
 [node name="ExpandTarget" type="Node2D" parent="GraphManager"]
 position = Vector2(800, -24)
 
 [node name="ExpandTarget2" type="Node2D" parent="GraphManager"]
 position = Vector2(-792, -32)
+
+[node name="ExpandTarget3" type="Node2D" parent="GraphManager"]
+position = Vector2(-1128, -32)
+
+[node name="ExpandTarget4" type="Node2D" parent="GraphManager"]
+position = Vector2(-224, -168)
 
 [node name="Phantoms" type="Node2D" parent="."]
 

@@ -81,17 +81,25 @@ position = Vector2(800, 32)
 [node name="RedSoldier3" parent="Goblins" instance=ExtResource("6_k1nba")]
 position = Vector2(800, 96)
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot")]
+[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot", "outerSpot", "innerSpot")]
 script = ExtResource("5_iqhng")
 debugDraw = true
 shortSpot = NodePath("Shortspot")
 cutSpot = NodePath("Cutspot")
+outerSpot = NodePath("OuterSpot")
+innerSpot = NodePath("InnerSpot")
 
 [node name="Shortspot" type="Node2D" parent="GraphManager"]
 position = Vector2(672, 32)
 
 [node name="Cutspot" type="Node2D" parent="GraphManager"]
 position = Vector2(-800, 192)
+
+[node name="OuterSpot" type="Node2D" parent="GraphManager"]
+position = Vector2(-1120, -32)
+
+[node name="InnerSpot" type="Node2D" parent="GraphManager"]
+position = Vector2(-416, -96)
 
 [node name="Phantoms" type="Node2D" parent="."]
 

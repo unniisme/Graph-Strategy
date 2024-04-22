@@ -9,6 +9,6 @@ namespace Graphs.Shannon
         public void Cut(T edgeData);
         public void Short(T edgeData);
 
-        public T GetShortMove();
+        public T ShortMove {get;}
     }
 }

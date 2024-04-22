@@ -11,8 +11,6 @@ namespace Graphs.Shannon
 
         public GraphUpdateShannonStrategy(Graph<T> graph) : base(graph) {}
 
-        private T shortMove = default;
-
         public override void Cut(T edgeData)
         {
             if (!graph.DataEdgeMap.ContainsKey(edgeData)) return;
@@ -22,12 +20,12 @@ namespace Graphs.Shannon
             graph.RemoveEdge(graph.DataEdgeMap[edgeData]);
             if (spanningTreeA.DataEdgeMap.ContainsKey(edgeData))
             {
-                shortMove = CutEdge(1, edgeData);
+                ShortMove = CutEdge(1, edgeData);
                 return;
             }
             else if (spanningTreeB.DataEdgeMap.ContainsKey(edgeData))
             {
-                shortMove = CutEdge(0, edgeData);
+                ShortMove = CutEdge(0, edgeData);
                 return;
             }
             Logger?.Warn("Edge not present in either spanningTree");
@@ -42,16 +40,11 @@ namespace Graphs.Shannon
             Edge<T> shortedEdge = graph.DataEdgeMap[edgeData];
             graph.ShortEdge(shortedEdge);
 
-            shortMove = default;
+            ShortMove = default;
 
             Clear();
             FindSpanningTrees();
         }
-        public override T GetShortMove()
-        {
-            return shortMove;
-        }
-
         private T CutEdge(int tree, T cutEdgeData)
         {
             SpanningTree<T> otherST = SpanningTrees[OtherIndex(tree)]; 

@@ -6,6 +6,7 @@ using Godot;
 using Graphs;
 using Graphs.Shannon;
 using Logging;
+using Utils;
 
 namespace Gamelogic.Managers
 {
@@ -97,11 +98,11 @@ namespace Gamelogic.Managers
                                                         );
 
 
-            shannonStrategyShort = new TwoPlayerShannonStrategy<Vector2I>(islandGraph)
+            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph)
             {
                 Trace = new("shannonStrategyShort")
             };
-            shannonStrategyCut = new TwoPlayerShannonStrategy<Vector2I>(islandGraphDual)
+            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual)
             {
                 Trace = new("shannonStrategyCut")
             };
@@ -120,7 +121,7 @@ namespace Gamelogic.Managers
             shannonStrategyShort.Short(moveBridge);
             shannonStrategyCut.Cut(moveBridge);
 
-            Vector2I cutMove = shannonStrategyCut.GetShortMove();
+            Vector2I cutMove = shannonStrategyCut.ShortMove;
             GD.Print($"Cut Move : {cutMove}");
 
             QueueRedraw();
@@ -133,7 +134,7 @@ namespace Gamelogic.Managers
             shannonStrategyShort.Cut(moveBridge);
             shannonStrategyCut.Short(moveBridge);
 
-            Vector2I shortMove = shannonStrategyShort.GetShortMove();
+            Vector2I shortMove = shannonStrategyShort.ShortMove;
             GD.Print($"Short Move : {shortMove}");
 
             QueueRedraw();
@@ -175,7 +176,7 @@ namespace Gamelogic.Managers
                 Vector2 from = grid.GridCoordinateToGameCoordinate(edge.FromNode.Data);
                 Vector2 edgePos = grid.GridCoordinateToGameCoordinate(edge.Data);
                 Vector2 to = grid.GridCoordinateToGameCoordinate(edge.ToNode.Data);
-
+                
                 DrawLine(from, edgePos, col);
                 DrawLine(edgePos, to, col);
             }
