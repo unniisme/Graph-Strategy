@@ -50,7 +50,7 @@ namespace Graphs.Utils
             Nodes.Remove(node);
             DataNodeMap.Remove(node.Data);
 
-            VertexSet.parent.Remove(node.Data);
+            // VertexSet.parent.Remove(node.Data); // Should do more deliberation on this one
         }
         
     }

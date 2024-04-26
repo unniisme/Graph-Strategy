@@ -4,7 +4,7 @@ namespace Graphs.Shannon
     {
         public void FindSpanningTrees();
 
-        public bool SpanningTreesExist(T a, T b);
+        public bool SpanningTreesExist();
         
         public void Cut(T edgeData);
         public void Short(T edgeData);

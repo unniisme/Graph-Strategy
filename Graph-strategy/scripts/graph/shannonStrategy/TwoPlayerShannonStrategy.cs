@@ -27,9 +27,14 @@ namespace Graphs.Shannon
 
         internal static int OtherIndex(int i) => (i+1)%2;
 
-        public TwoPlayerShannonStrategy(Graph<T> graph)
+        internal T source;
+        internal T sink;
+
+        public TwoPlayerShannonStrategy(Graph<T> graph, T source, T sink)
         {
             this.graph = graph;
+            this.source = source;
+            this.sink = sink;
 
             Clear();
 
@@ -231,18 +236,20 @@ namespace Graphs.Shannon
                 TryGrowSpanningTrees(edge);
             }
 
+            ReduceSpanningTrees();
+
             return;
         }
 
-        public bool SpanningTreesExist(T a, T b)
+        public bool SpanningTreesExist()
         {
             foreach (SpanningTree<T> sp in SpanningTrees)
             {
-                if (!sp.VertexSet.ContainsElement(a) || !sp.VertexSet.ContainsElement(b))
+                if (!sp.VertexSet.ContainsElement(source) || !sp.VertexSet.ContainsElement(sink))
                 {
                     return false;
                 }
-                if (!sp.VertexSet.Find(a).Equals(sp.VertexSet.Find(b)))
+                if (!sp.VertexSet.Find(source).Equals(sp.VertexSet.Find(sink)))
                 {
                     return false;
                 }
@@ -256,41 +263,22 @@ namespace Graphs.Shannon
             return true;
         }
 
-        private bool ExtractIntersection()
+        public void ReduceSpanningTrees()
         {
-            bool isUpdated = false; 
 
-            // Extracting intersection graph
-            HashSet<T> nodesA = new();
-            HashSet<T> nodesB = new();
-            foreach (Edge<T> edge in spanningTreeA.Edges)
+            foreach (SpanningTree<T> sp in SpanningTrees)
             {
-                nodesA.Add(edge.FromNode.Data);
-                nodesA.Add(edge.ToNode.Data);
-            }
-            foreach (Edge<T> edge in spanningTreeB.Edges)
-            {
-                nodesB.Add(edge.FromNode.Data);
-                nodesB.Add(edge.ToNode.Data);
-            }
-
-            HashSet<T> intersectionNodes = nodesA.Intersect(nodesB).ToHashSet();
-            foreach (Node<T> node in graph.Nodes)
-            {   
-                if (!intersectionNodes.Contains(node.Data))
+                foreach (Node<T> node in sp.Nodes)
                 {
-                    if (!spanningTreeA.DataNodeMap.ContainsKey(node.Data) && !spanningTreeB.DataNodeMap.ContainsKey(node.Data))
-                        continue;
-
-                    spanningTreeA.RemoveNode(node);
-                    spanningTreeB.RemoveNode(node);
-
-                    Trace.Inform($"Removing node {DataToString(node.Data)} from STs");
-                    isUpdated = true;
+                    if (!(sp.VertexSet.Find(source).Equals(sp.VertexSet.Find(node.Data)) || !sp.VertexSet.Find(sink).Equals(sp.VertexSet.Find(node.Data))))
+                    {
+                        // Note, this is not fully correct as the node is not removed from the corresponding DSU
+                        // But it functions correctly as the corresponding edges are also removed
+                        sp.RemoveNode(node);
+                        Trace.Debug($"Reduce : Removing node {node.Data}");
+                    }
                 }
             }
-
-            return isUpdated;
         }
 
         public virtual void Short(T edgeData)

@@ -26,7 +26,7 @@ namespace Graphs.Utils
         {
             if (!parentDict.ContainsKey(element))
             {
-                throw new ArgumentException("Element does not exist in the DSU.");
+                throw new ArgumentException($"Element {element} does not exist in the DSU.");
             }
 
             if (!parentDict[element].Equals(element))
@@ -41,7 +41,7 @@ namespace Graphs.Utils
         {
             if (!parent.ContainsKey(element))
             {
-                throw new ArgumentException("Element does not exist in the DSU.");
+                throw new ArgumentException($"Element {element} does not exist in the DSU.");
             }
 
             if (!parent[element].Equals(element))

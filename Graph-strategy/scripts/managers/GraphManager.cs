@@ -98,11 +98,14 @@ namespace Gamelogic.Managers
                                                         );
 
 
-            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph)
+
+            Vector2I source = islandGraph.islets.Find(GridPosition(cutSpot)); 
+            Vector2I sink = islandGraph.islets.Find(GridPosition(shortSpot)); 
+            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph, source, sink)
             {
                 Trace = new("shannonStrategyShort")
             };
-            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual)
+            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual, islandGraphDual.UpperIslet, islandGraphDual.LowerIslet)
             {
                 Trace = new("shannonStrategyCut")
             };
@@ -116,29 +119,38 @@ namespace Gamelogic.Managers
 
         private void MakeShortMove(Vector2I pos)
         {
-            if (!islandGraph.islets.ContainsElement(pos)) return;
-            Vector2I moveBridge = islandGraph.islets.Find(pos);
-            shannonStrategyShort.Short(moveBridge);
-            shannonStrategyCut.Cut(moveBridge);
+            if (islandGraph.islets.ContainsElement(pos))
+            {
+                Vector2I moveBridge = islandGraph.islets.Find(pos);
+                shannonStrategyShort.Short(moveBridge);
+                shannonStrategyCut.Cut(moveBridge);
+
+                QueueRedraw();
+            }
 
             Vector2I cutMove = shannonStrategyCut.ShortMove;
             GD.Print($"Cut Move : {cutMove}");
-
-            QueueRedraw();
         }
 
         private void MakeCutMove(Vector2I pos)
         {
-            if (!islandGraph.islets.ContainsElement(pos)) return;
-            Vector2I moveBridge = islandGraph.islets.Find(pos);
-            shannonStrategyShort.Cut(moveBridge);
-            shannonStrategyCut.Short(moveBridge);
+            if (islandGraph.islets.ContainsElement(pos))
+            {
+                Vector2I moveBridge = islandGraph.islets.Find(pos);
+                shannonStrategyShort.Cut(moveBridge);
+                shannonStrategyCut.Short(moveBridge);
+                
+                QueueRedraw();
+            }
 
             Vector2I shortMove = shannonStrategyShort.ShortMove;
             GD.Print($"Short Move : {shortMove}");
-
-            QueueRedraw();
         }
+
+        private Vector2I GridPosition(Node2D node) => grid.GameCoordinateToGridCoordinate(node.Position);
+
+
+        //------------------Rendering----------------------------------------------------
 
         private void DrawEdges(List<Edge<Vector2I>> edges, float radius, Color color)
         {

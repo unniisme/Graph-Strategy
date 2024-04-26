@@ -12,6 +12,9 @@ namespace Gamelogic.Grid.Graph
 
         private Vector2I upperIslet;
         private Vector2I? lowerIslet;
+    
+        public Vector2I UpperIslet => upperIslet;
+        public Vector2I LowerIslet => (Vector2I)lowerIslet;
 
         public DualIslandBridgeGraph(Node<Vector2I> outer, Node<Vector2I> inner, IslandBridgeGraph<Vector2I> primal, Logger logger = null) 
         {
@@ -37,9 +40,9 @@ namespace Gamelogic.Grid.Graph
 
 
             upperIslet = islets.Find(upperIslet);
-            lowerIslet = islets.Find((Vector2I)lowerIslet);
+            lowerIslet = islets.Find(LowerIslet);
             overGraph.AddNode(upperIslet);
-            overGraph.AddNode((Vector2I)lowerIslet);
+            overGraph.AddNode(LowerIslet);
 
             Trace.Inform($"upperIsland : {upperIslet}, lowerIslet : {lowerIslet}");
 
@@ -68,8 +71,8 @@ namespace Gamelogic.Grid.Graph
                     }
                     else
                     {
-                        islets.Union((Vector2I)lowerIslet, curr.Data);
-                        lowerIslet = islets.Find((Vector2I)lowerIslet);
+                        islets.Union(LowerIslet, curr.Data);
+                        lowerIslet = islets.Find(LowerIslet);
                     }
                 }
             }

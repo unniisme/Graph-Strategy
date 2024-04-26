@@ -16,7 +16,6 @@
 script = ExtResource("1_woexo")
 grid = NodePath("GodotGrid")
 buildGrid = NodePath("BuildGrid")
-currentTeam = 1
 phantoms = [NodePath("Phantoms/BluePhantom"), NodePath("Phantoms/RedPhantom")]
 totalMoves = 4
 

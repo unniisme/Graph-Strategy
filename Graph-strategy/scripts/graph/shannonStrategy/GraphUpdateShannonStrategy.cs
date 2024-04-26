@@ -9,7 +9,7 @@ namespace Graphs.Shannon
     {
         public Logger Logger {get;set;} = new Logger("GraphUpdateShannonStrategy");
 
-        public GraphUpdateShannonStrategy(Graph<T> graph) : base(graph) {}
+        public GraphUpdateShannonStrategy(Graph<T> graph, T source, T sink) : base(graph, source, sink) {}
 
         public override void Cut(T edgeData)
         {
@@ -18,15 +18,19 @@ namespace Graphs.Shannon
             Logger?.Inform($"Cutting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
 
             graph.RemoveEdge(graph.DataEdgeMap[edgeData]);
-            if (spanningTreeA.DataEdgeMap.ContainsKey(edgeData))
+
+            if (SpanningTreesExist())
             {
-                ShortMove = CutEdge(1, edgeData);
-                return;
-            }
-            else if (spanningTreeB.DataEdgeMap.ContainsKey(edgeData))
-            {
-                ShortMove = CutEdge(0, edgeData);
-                return;
+                if (spanningTreeA.DataEdgeMap.ContainsKey(edgeData))
+                {
+                    ShortMove = CutEdge(1, edgeData);
+                    return;
+                }
+                else if (spanningTreeB.DataEdgeMap.ContainsKey(edgeData))
+                {
+                    ShortMove = CutEdge(0, edgeData);
+                    return;
+                }
             }
             Logger?.Warn("Edge not present in either spanningTree");
         }
@@ -38,7 +42,10 @@ namespace Graphs.Shannon
             Logger?.Inform($"Shorting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
 
             Edge<T> shortedEdge = graph.DataEdgeMap[edgeData];
-            graph.ShortEdge(shortedEdge);
+            Node<T> mergedNode = graph.ShortEdge(shortedEdge);
+
+            if (source.Equals(shortedEdge.ToNode.Data) || source.Equals(shortedEdge.FromNode.Data)) source = mergedNode.Data;
+            if (sink.Equals(shortedEdge.ToNode.Data) || sink.Equals(shortedEdge.FromNode.Data)) sink = mergedNode.Data;
 
             ShortMove = default;
 
@@ -61,15 +68,18 @@ namespace Graphs.Shannon
             spanningTreeSearch.Update();
 
             Dictionary<T,T> otherVS = spanningTreeSearch.searchDict;
+
+            otherST.AddEdge(removedEdge.FromNode.Data, removedEdge.ToNode.Data, cutEdgeData);
             
             foreach (Edge<T> e in SpanningTrees[tree].Edges)
             {
                 if (!DSU<T>.CustomFind(e.FromNode.Data, otherVS).Equals(DSU<T>.CustomFind(e.ToNode.Data, otherVS)))
                 {
-                    otherST.AddEdge(e.FromNode.Data, e.ToNode.Data, cutEdgeData);
                     return e.Data;
                 }
             }
+            Trace.Warn("No move found even though spanning trees exist");
+            
             return default;
         }
     }
