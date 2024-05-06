@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Graphs.Search;
 using Graphs.Utils;
 using Logging;
@@ -9,9 +8,9 @@ namespace Graphs.Shannon
 {
     public class TwoPlayerShannonStrategy<T> : IShannonStrategy<T>
     {
-        public Logger Trace { get; set; } = new Logger("TwoPlayerShannonStrategy");
+        public virtual Logger Trace { get; set; } = new Logger("TwoPlayerShannonStrategy");
 
-        internal readonly Graph<T> graph;
+        internal Graph<T> graph;
         internal SpanningTree<T> spanningTreeA = new();
         internal SpanningTree<T> spanningTreeB = new();
         internal readonly Dictionary<T,int> edgeToSpanningTree = new();
@@ -30,6 +29,8 @@ namespace Graphs.Shannon
         internal T source;
         internal T sink;
 
+        public TwoPlayerShannonStrategy() {}
+
         public TwoPlayerShannonStrategy(Graph<T> graph, T source, T sink)
         {
             this.graph = graph;
@@ -41,7 +42,7 @@ namespace Graphs.Shannon
             Trace.Inform("Initializing");
         }
 
-        internal void Clear()
+        public void Clear()
         {
             spanningTreeA = new()
             {
@@ -55,7 +56,7 @@ namespace Graphs.Shannon
             shortedEdges.Clear();
         }
 
-        private bool TryGrowSpanningTrees(Edge<T> edge)
+        internal bool TryGrowSpanningTrees(Edge<T> edge)
         {
             // Case 0: if edge can be added to either st
             foreach (SpanningTree<T> sp in SpanningTrees)
@@ -90,6 +91,7 @@ namespace Graphs.Shannon
                 auxillarySearch = RunAuxillarySearch(auxillaryEdgeGraph, edge, startIndex);
                 if (!auxillarySearch.Reachable)
                 {
+                    Trace.Warn($"Not possible to add edge {edge.Data} to either spanning tree");
                     return false;
                 }
             }
@@ -215,7 +217,7 @@ namespace Graphs.Shannon
 
             return auxillarySearch;
         }
-        public void FindSpanningTrees()
+        public virtual void FindSpanningTrees()
         {
             // Initialize spanning trees
             foreach (Node<T> node in graph.Nodes)
@@ -241,7 +243,7 @@ namespace Graphs.Shannon
             return;
         }
 
-        public bool SpanningTreesExist()
+        public virtual bool SpanningTreesExist()
         {
             foreach (SpanningTree<T> sp in SpanningTrees)
             {

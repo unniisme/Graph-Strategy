@@ -7,15 +7,20 @@ namespace Graphs.Shannon
 {
     public class GraphUpdateShannonStrategy<T> : TwoPlayerShannonStrategy<T>
     {
-        public Logger Logger {get;set;} = new Logger("GraphUpdateShannonStrategy");
+        public override Logger Trace {get;set;} = new Logger("GraphUpdateShannonStrategy");
 
         public GraphUpdateShannonStrategy(Graph<T> graph, T source, T sink) : base(graph, source, sink) {}
+        public GraphUpdateShannonStrategy() : base() {}
 
         public override void Cut(T edgeData)
         {
-            if (!graph.DataEdgeMap.ContainsKey(edgeData)) return;
+            if (!graph.DataEdgeMap.ContainsKey(edgeData))
+            {
+                Trace?.Error($"(Cutting) Edge {edgeData} not present in graph");
+                return;
+            }
 
-            Logger?.Inform($"Cutting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
+            Trace?.Inform($"Cutting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
 
             graph.RemoveEdge(graph.DataEdgeMap[edgeData]);
 
@@ -32,14 +37,18 @@ namespace Graphs.Shannon
                     return;
                 }
             }
-            Logger?.Warn("Edge not present in either spanningTree");
+            Trace?.Warn("Edge not present in either spanningTree");
         }
 
         public override void Short(T edgeData)
         {
-            if (!graph.DataEdgeMap.ContainsKey(edgeData)) return;
+            if (!graph.DataEdgeMap.ContainsKey(edgeData))
+            {
+                Trace?.Error($"(Shorting) Edge {edgeData} not present in graph");
+                return;
+            }
 
-            Logger?.Inform($"Shorting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
+            Trace?.Inform($"Shorting {edgeData} ({graph.DataEdgeMap[edgeData].FromNode.Data}) -> {graph.DataEdgeMap[edgeData].ToNode.Data}");
 
             Edge<T> shortedEdge = graph.DataEdgeMap[edgeData];
             Node<T> mergedNode = graph.ShortEdge(shortedEdge);
@@ -49,10 +58,11 @@ namespace Graphs.Shannon
 
             ShortMove = default;
 
-            Clear();
-            FindSpanningTrees();
+            // Do outside from manager
+            // Clear();
+            // FindSpanningTrees();
         }
-        private T CutEdge(int tree, T cutEdgeData)
+        internal T CutEdge(int tree, T cutEdgeData)
         {
             SpanningTree<T> otherST = SpanningTrees[OtherIndex(tree)]; 
             Edge<T> removedEdge = otherST.DataEdgeMap[cutEdgeData];

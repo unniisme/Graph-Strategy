@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gamelogic.Grid;
@@ -5,6 +6,7 @@ using Gamelogic.Grid.Graph;
 using Godot;
 using Graphs;
 using Graphs.Shannon;
+using Graphs.Utils;
 using Logging;
 using Utils;
 
@@ -20,8 +22,8 @@ namespace Gamelogic.Managers
         private IGrid grid = null;
         private IslandBridgeGraph<Vector2I> islandGraph = null;
         private DualIslandBridgeGraph islandGraphDual = null;
-        private IShannonStrategy<Vector2I> shannonStrategyShort;
-        private IShannonStrategy<Vector2I> shannonStrategyCut;
+        private IShannonStrategy<WeightedData<Vector2I>> shannonStrategyShort;
+        private IShannonStrategy<WeightedData<Vector2I>> shannonStrategyCut;
 
         bool draw = false;
         bool drawDual = false;
@@ -94,24 +96,35 @@ namespace Gamelogic.Managers
             Vector2I outer = grid.GameCoordinateToGridCoordinate(outerSpot.Position);
             Vector2I inner = grid.GameCoordinateToGridCoordinate(innerSpot.Position);
             islandGraphDual = new DualIslandBridgeGraph(gridGraphDual.DataNodeMap[outer], gridGraphDual.DataNodeMap[inner],
-                                                            islandGraph, new("islandGraphDual")
+                                                            islandGraph, new("islandGraphDual", LogLevel.DEBUG)
                                                         );
 
 
 
             Vector2I source = islandGraph.islets.Find(GridPosition(cutSpot)); 
             Vector2I sink = islandGraph.islets.Find(GridPosition(shortSpot)); 
-            shannonStrategyShort = new GraphUpdateShannonStrategy<Vector2I>(islandGraph, source, sink)
+            shannonStrategyShort = new WeightedShannonStrategy<Vector2I>(islandGraph, source, sink)
             {
                 Trace = new("shannonStrategyShort")
             };
-            shannonStrategyCut = new GraphUpdateShannonStrategy<Vector2I>(islandGraphDual, islandGraphDual.UpperIslet, islandGraphDual.LowerIslet)
+            shannonStrategyCut = new WeightedShannonStrategy<Vector2I>(islandGraphDual, islandGraphDual.UpperIslet, islandGraphDual.LowerIslet)
             {
                 Trace = new("shannonStrategyCut")
             };
 
             shannonStrategyShort.FindSpanningTrees();
             shannonStrategyCut.FindSpanningTrees();
+
+            if (GameManager.GetLevel().currentTeam == 0)
+            {
+                var cutMove = shannonStrategyCut.ShortMove;
+                GD.Print($"Cut Move : {cutMove}");
+            }
+            else
+            {
+                var shortMove = shannonStrategyShort.ShortMove;
+                GD.Print($"Short Move : {shortMove}");
+            }
 
             if (debugWrite) 
                 GD.Print(ShowIslandGraph(islandGraph));
@@ -122,13 +135,22 @@ namespace Gamelogic.Managers
             if (islandGraph.islets.ContainsElement(pos))
             {
                 Vector2I moveBridge = islandGraph.islets.Find(pos);
-                shannonStrategyShort.Short(moveBridge);
-                shannonStrategyCut.Cut(moveBridge);
-
-                QueueRedraw();
+                shannonStrategyShort.Short(WeightedData<Vector2I>.Edge(moveBridge,1));
+                shannonStrategyShort.Short(WeightedData<Vector2I>.Edge(moveBridge,2));
+                shannonStrategyShort.Clear();
+                shannonStrategyShort.FindSpanningTrees();
             }
+            if (islandGraphDual.islets.ContainsElement(pos))
+            {
+                Vector2I moveBridge = islandGraphDual.islets.Find(pos);
+                shannonStrategyCut.Cut(WeightedData<Vector2I>.Edge(moveBridge, 1));
+                shannonStrategyCut.Cut(WeightedData<Vector2I>.Edge(moveBridge, 2));
+                shannonStrategyCut.Clear();
+                shannonStrategyCut.FindSpanningTrees();
+            }
+            QueueRedraw();
 
-            Vector2I cutMove = shannonStrategyCut.ShortMove;
+            var cutMove = shannonStrategyCut.ShortMove;
             GD.Print($"Cut Move : {cutMove}");
         }
 
@@ -137,13 +159,24 @@ namespace Gamelogic.Managers
             if (islandGraph.islets.ContainsElement(pos))
             {
                 Vector2I moveBridge = islandGraph.islets.Find(pos);
-                shannonStrategyShort.Cut(moveBridge);
-                shannonStrategyCut.Short(moveBridge);
-                
-                QueueRedraw();
-            }
+                shannonStrategyShort.Cut(WeightedData<Vector2I>.Edge(moveBridge,1));
+                shannonStrategyShort.Cut(WeightedData<Vector2I>.Edge(moveBridge,2));
+                shannonStrategyShort.Clear();
+                shannonStrategyShort.FindSpanningTrees();
 
-            Vector2I shortMove = shannonStrategyShort.ShortMove;
+                
+            }
+            if (islandGraphDual.islets.ContainsElement(pos))
+            {
+                Vector2I moveBridge = islandGraphDual.islets.Find(pos);
+                shannonStrategyCut.Short(WeightedData<Vector2I>.Edge(moveBridge, 1));
+                shannonStrategyCut.Short(WeightedData<Vector2I>.Edge(moveBridge, 2));
+                shannonStrategyCut.Clear();
+                shannonStrategyCut.FindSpanningTrees();
+            }
+            QueueRedraw();
+
+            var shortMove = shannonStrategyShort.ShortMove;
             GD.Print($"Short Move : {shortMove}");
         }
 
@@ -151,14 +184,6 @@ namespace Gamelogic.Managers
 
 
         //------------------Rendering----------------------------------------------------
-
-        private void DrawEdges(List<Edge<Vector2I>> edges, float radius, Color color)
-        {
-            foreach (Edge<Vector2I> edge in edges)
-            {
-                DrawCircle(grid.GridCoordinateToGameCoordinate(edge.Data), radius, color);
-            }
-        }
 
         private void DrawGraph(Graph<Vector2I> graph, float radius, Color col)
         {
@@ -194,6 +219,14 @@ namespace Gamelogic.Managers
             }
         }
 
+        private void DrawSpanningTrees(SpanningTree<WeightedData<Vector2I>> spanningTree, float radius, Color col)
+        {
+            foreach (Edge<WeightedData<Vector2I>> edge in spanningTree.Edges)
+            {
+                DrawCircle(grid.GridCoordinateToGameCoordinate(edge.Data.item), radius, col);
+            }
+        }
+
         public override void _Draw()
         {
             if (gridGraph == null) return;
@@ -208,11 +241,11 @@ namespace Gamelogic.Managers
                         DrawMultiGraph(islandGraphDual, 7, Colors.Red);
                     }
 
-                    // if (debugDrawSpanningTrees)
-                    // {
-                    //     DrawEdges(spanningTreesDual.Item1, 10,  Colors.GreenYellow);
-                    //     DrawEdges(spanningTreesDual.Item2, 10,  Colors.BlanchedAlmond);
-                    // }
+                    if (debugDrawSpanningTrees)
+                    {
+                        DrawSpanningTrees(shannonStrategyCut.SpanningTrees[0], 15,  Colors.GreenYellow);
+                        DrawSpanningTrees(shannonStrategyCut.SpanningTrees[1], 10,  Colors.BlueViolet);
+                    }
                 }
                 else
                 {
@@ -222,15 +255,16 @@ namespace Gamelogic.Managers
                         DrawMultiGraph(islandGraph, 7, Colors.Red);
                     }
 
-                    // if (debugDrawSpanningTrees)
-                    // {
-                    //     DrawEdges(spanningTrees.Item1, 10,  Colors.GreenYellow);
-                    //     DrawEdges(spanningTrees.Item2, 10,  Colors.BlanchedAlmond);
-                    // }
+                    if (debugDrawSpanningTrees)
+                    {
+                        DrawSpanningTrees(shannonStrategyShort.SpanningTrees[0], 15,  Colors.GreenYellow);
+                        DrawSpanningTrees(shannonStrategyShort.SpanningTrees[1], 10,  Colors.BlueViolet);
+                    }
                 }
             }
 
         }
+
 
         private static string ShowIslandGraph(IslandBridgeGraph<Vector2I> graph)
         {

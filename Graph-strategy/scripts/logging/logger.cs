@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using Godot;
 
 namespace Logging
 {
@@ -16,6 +17,7 @@ namespace Logging
     public class Logger
     {
         public LogLevel LogLevel { get; set; } = LogLevel.INFO;
+        public LogLevel GDPrintLevel { get; set; } = LogLevel.WARNING;
         public string Header {get;private set;}= "[]";
 
         public Logger(string name, LogLevel logLevel = LogLevel.INFO)
@@ -32,7 +34,13 @@ namespace Logging
 
         public void Log(string message, LogLevel level)
         {
+            if (level < LogLevel) return;
             StaticLogger.Log(message, Header, level);
+
+            if (level > GDPrintLevel)
+            {
+                GD.Print($"{Header}[{StaticLogger.LogLevelName(level)}] {message}");
+            }
         }
 
 
@@ -184,7 +192,7 @@ namespace Logging
         }
 
 
-        static string LogLevelName( LogLevel level )
+        public static string LogLevelName( LogLevel level )
         {
             return Enum.GetName( typeof(LogLevel) , level );
         }

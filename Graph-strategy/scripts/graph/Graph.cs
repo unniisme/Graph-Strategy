@@ -25,7 +25,7 @@ namespace Graphs
     /// <typeparam name="T"></typeparam>
     public class Graph<T>
     {
-        public Logger Trace {get; set;} = new Logger("Graph");
+        public virtual Logger Trace {get; set;} = new Logger("Graph");
 
         public int UID {get;} = GameResources.UIDgen;
 
@@ -71,6 +71,9 @@ namespace Graphs
 
         public virtual void AddEdge(Node<T> fromNode, Node<T> toNode, T data)
         {
+            Trace.Debug($"Adding edge {fromNode.Data} -> {toNode.Data} : {data}");
+
+
             Edge<T> newEdge = new()
             {
                 FromNode = fromNode,
@@ -90,13 +93,12 @@ namespace Graphs
 
         public virtual void AddEdge(T fromData, T toData, T edgeData)
         {
-            Trace.Inform($"Adding edge {fromData} -> {toData} : {edgeData}");
             AddEdge(DataNodeMap[fromData], DataNodeMap[toData], edgeData);
         }
 
         public virtual void RemoveEdge(Edge<T> edge)
         {
-            Trace.Inform($"Removing edge {edge.FromNode.Data} -> {edge.ToNode.Data} : {edge.Data}");
+            Trace.Debug($"Removing edge {edge.FromNode.Data} -> {edge.ToNode.Data} : {edge.Data}");
             edge.FromNode.AdjList.Remove(edge);
             Edges.Remove(edge);
             DataEdgeMap.Remove(edge.Data);

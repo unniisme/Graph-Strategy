@@ -127,7 +127,7 @@ namespace Gamelogic.Grid.Graph
                 Vector2I islet = node.Data;
                 if (!islets.IsIsland(islet))
                 {
-                    islet = primal.islets.Find(islet);
+                    islets.LeftUnion(primal.islets.Find(islet), islet);
                     if (islets.Find(node.AdjList[0].ToNode.Data).Equals(islets.Find(node.AdjList[1].ToNode.Data)))
                             continue;
 
