@@ -38,6 +38,10 @@ position = Vector2(1184, -144)
 [node name="RedSoldier4" parent="Goblins" index="3" instance=ExtResource("3_g160p")]
 position = Vector2(1112, -144)
 
+[node name="GraphManager" parent="." index="8" node_paths=PackedStringArray("nodeOverridesFrom", "nodeOverridesTo")]
+nodeOverridesFrom = []
+nodeOverridesTo = []
+
 [node name="ShortSpot" parent="GraphManager" index="0"]
 position = Vector2(1120, -24)
 

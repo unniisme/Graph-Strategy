@@ -46,6 +46,12 @@ namespace Gamelogic.Managers
         [Export]
         public Node2D innerSpot;
 
+        [Export]
+        public Node2D[] nodeOverridesFrom;
+        [Export]
+
+        public Node2D[] nodeOverridesTo;
+
         BuildPhantom cutPhantom; // blue
         BuildPhantom shortPhantom; // red
 
@@ -184,6 +190,17 @@ namespace Gamelogic.Managers
 
 
         //------------------Rendering----------------------------------------------------
+        private Vector2I OverriddenNodePos(Vector2I nodePos)
+        {
+            for (int i = 0; i < nodeOverridesFrom.Length; i++)
+            {
+                if (nodePos == grid.GameCoordinateToGridCoordinate(nodeOverridesFrom[i].Position))
+                {
+                    return grid.GameCoordinateToGridCoordinate(nodeOverridesTo[i].Position);
+                }
+            }
+            return nodePos;
+        }
 
         private void DrawGraph(Graph<Vector2I> graph, float radius, Color col)
         {
@@ -206,13 +223,13 @@ namespace Gamelogic.Managers
             foreach (Node<Vector2I> node in graph.Nodes)
             {
                 Vector2I pos = node.Data;
-                DrawCircle(grid.GridCoordinateToGameCoordinate(pos), radius, col);
+                DrawCircle(grid.GridCoordinateToGameCoordinate(OverriddenNodePos(pos)), radius, col);
             }
             foreach (Edge<Vector2I> edge in graph.Edges)
             {
-                Vector2 from = grid.GridCoordinateToGameCoordinate(edge.FromNode.Data);
-                Vector2 edgePos = grid.GridCoordinateToGameCoordinate(edge.Data);
-                Vector2 to = grid.GridCoordinateToGameCoordinate(edge.ToNode.Data);
+                Vector2 from = grid.GridCoordinateToGameCoordinate(OverriddenNodePos(edge.FromNode.Data));
+                Vector2 edgePos = grid.GridCoordinateToGameCoordinate(OverriddenNodePos(edge.Data));
+                Vector2 to = grid.GridCoordinateToGameCoordinate(OverriddenNodePos(edge.ToNode.Data));
                 
                 DrawLine(from, edgePos, col);
                 DrawLine(edgePos, to, col);

@@ -34,6 +34,9 @@ namespace Gamelogic.Managers
         [Export]
         public Node2D humanTarget;
 
+        [Export]
+        public CanvasLayer PauseMenu;
+
         public event Action<Vector2I> AttackEvent;
 
         public override void _Ready()
@@ -70,7 +73,14 @@ namespace Gamelogic.Managers
                 }
 
                 AttackEvent?.Invoke(grid.GameCoordinateToGridCoordinate(humanTarget.Position));
+
+                GetTree().CreateTimer(10, false).Timeout += () => EndLevel(0);
             }
+        }
+
+        public void EndLevel(int playerIndex)
+        {
+            PauseMenu?.Call("player_win", playerIndex);
         }
 
 

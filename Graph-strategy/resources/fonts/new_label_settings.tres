@@ -1,0 +1,10 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://c87fvkdke73uf"]
+
+[ext_resource type="FontFile" uid="uid://bo5u48ry4m40k" path="res://assets/Fonts/press-start-font/PressStartRegular-ay8E.ttf" id="1_rxy4e"]
+
+[resource]
+font = ExtResource("1_rxy4e")
+font_size = 31
+font_color = Color(0.847059, 0, 0, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)

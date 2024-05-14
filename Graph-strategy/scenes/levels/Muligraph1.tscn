@@ -62,13 +62,15 @@ Offset = Vector2(32, 32)
 
 [node name="Goblins" type="Node2D" parent="."]
 
-[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot", "outerSpot", "innerSpot")]
+[node name="GraphManager" type="Node2D" parent="." node_paths=PackedStringArray("shortSpot", "cutSpot", "outerSpot", "innerSpot", "nodeOverridesFrom", "nodeOverridesTo")]
 script = ExtResource("5_tlaab")
 debugDraw = true
 shortSpot = NodePath("ShortSpot")
 cutSpot = NodePath("CutSpot")
 outerSpot = NodePath("OuterSpot")
 innerSpot = NodePath("InnerSpot")
+nodeOverridesFrom = []
+nodeOverridesTo = []
 
 [node name="ShortSpot" type="Node2D" parent="GraphManager"]
 position = Vector2(544, 64)

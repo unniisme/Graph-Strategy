@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3 uid="uid://dxvp7ol0xbotj"]
+
+[ext_resource type="Texture2D" uid="uid://c6so67bv00ywf" path="res://assets/Tiny Swords/Tiny Swords (Update 010)/UI/Banners/Carved_9Slides.png" id="1_3yar3"]
+[ext_resource type="Script" path="res://scenes/UI/pause_menu.gd" id="1_t74is"]
+[ext_resource type="LabelSettings" uid="uid://c87fvkdke73uf" path="res://resources/fonts/new_label_settings.tres" id="2_rv81x"]
+[ext_resource type="FontFile" uid="uid://bo5u48ry4m40k" path="res://assets/Fonts/press-start-font/PressStartRegular-ay8E.ttf" id="3_r3oto"]
+
+[sub_resource type="Theme" id="Theme_i2rpq"]
+default_font = ExtResource("3_r3oto")
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+visible = false
+script = ExtResource("1_t74is")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -192.0
+offset_top = -188.0
+offset_right = 192.0
+offset_bottom = 188.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_3yar3")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -93.0
+offset_top = -90.0
+offset_right = 93.0
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+text = "Humans
+Won!"
+label_settings = ExtResource("2_rv81x")
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 60.0
+offset_right = 8.0
+offset_bottom = 68.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_i2rpq")
+text = "Quit"
