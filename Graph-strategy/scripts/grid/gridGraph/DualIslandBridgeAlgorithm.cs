@@ -107,9 +107,9 @@ namespace Gamelogic.Grid.Graph
                             || islets.Find(edge.FromNode.Data).Equals(islets.Find((Vector2I)lowerIslet)))
                                 continue;
 
-                            if (DataNodeMap.ContainsKey(edge.FromNode.Data))
+                            if (DataNodeMap.ContainsKey(islets.Find(edge.FromNode.Data)))
                                 RemoveNode(islets.Find(edge.FromNode.Data));
-                            if (DataNodeMap.ContainsKey(edge.ToNode.Data))
+                            if (DataNodeMap.ContainsKey(islets.Find(edge.ToNode.Data)))
                                 RemoveNode(islets.Find(edge.ToNode.Data));
 
                             islets.Union(edge.ToNode.Data, edge.FromNode.Data);

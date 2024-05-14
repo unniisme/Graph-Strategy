@@ -111,6 +111,9 @@ animations = [{
 [node name="RedSoldier" instance=ExtResource("1_s81wh")]
 teamName = "red"
 moveTime = 0.1
+setLayerZ = true
+
+[node name="Area2D" parent="." index="0" groups=["goblin"]]
 
 [node name="GodotGridNavigationAgent" parent="." index="1"]
 mask = PackedStringArray("red")

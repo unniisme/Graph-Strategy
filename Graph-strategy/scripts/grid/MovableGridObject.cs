@@ -39,8 +39,16 @@ namespace Gamelogic.Grid
 		[Export]
 		public virtual Vector2I GridPosition
 		{
-			get => grid.GetObjectPosition(this);
-			set => grid.MoveObject(this, value);
+			get 
+			{
+				if (grid == null) return default;
+				return grid.GetObjectPosition(this);
+			}
+			set
+			{
+				if (grid == null) return;
+				grid.MoveObject(this, value);
+			}
 		}
 
 		public MovableGridObject() {}

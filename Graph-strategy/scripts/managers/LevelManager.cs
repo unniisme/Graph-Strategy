@@ -1,3 +1,4 @@
+using System;
 using Gamelogic.Grid;
 using Gamelogic.Objects;
 using Godot;
@@ -29,6 +30,11 @@ namespace Gamelogic.Managers
 
         private int movesElapsed = 0;
         public bool CanAttack => movesElapsed >= totalMoves*2;
+
+        [Export]
+        public Node2D humanTarget;
+
+        public event Action<Vector2I> AttackEvent;
 
         public override void _Ready()
         {
@@ -62,6 +68,8 @@ namespace Gamelogic.Managers
                         }
                     }
                 }
+
+                AttackEvent?.Invoke(grid.GameCoordinateToGridCoordinate(humanTarget.Position));
             }
         }
 
